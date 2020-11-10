@@ -8,8 +8,8 @@ public class Constants {
 
         private camera() { }
 
-        public static final int VIEWPORT_WIDTH = 640;
-        public static final int VIEWPORT_HEIGHT = 480;
+        public static final int VIEWPORT_WIDTH = 720;
+        public static final int VIEWPORT_HEIGHT = 640;
     }
 
     public static class physics {
@@ -24,6 +24,10 @@ public class Constants {
         private entities() { }
 
         public static final int PROJECTILE_RADIUS = 4;
-        public static final Vector2 PROJECTILE_INIT_POS = new Vector2(320, 240);
+        public static final Vector2 PROJECTILE_INIT_POS = new Vector2((float) camera.VIEWPORT_WIDTH / 2f,
+                (float) camera.VIEWPORT_HEIGHT / 4f);
+        public static final int SUN_RADIUS = 32;
+        public static final Vector2 SUN_INIT_POS = new Vector2((float) camera.VIEWPORT_WIDTH / 2f,
+                (float) camera.VIEWPORT_HEIGHT / 2f);
     }
 }

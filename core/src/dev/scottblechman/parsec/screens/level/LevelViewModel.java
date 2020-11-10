@@ -8,18 +8,23 @@ import dev.scottblechman.parsec.common.Constants;
 public class LevelViewModel {
 
     World world;
-    Body projectile;
+    Body projectile, sun;
 
     final float STEP_TIME = 1f/60f;
     float accumulator = 0;
 
     public LevelViewModel() {
         world = new World(new Vector2(0, 0), true);
-        projectile = createBody(Constants.entities.PROJECTILE_INIT_POS, Constants.entities.PROJECTILE_RADIUS);
+        projectile = createBody(Constants.entities.PROJECTILE_INIT_POS, Constants.entities.PROJECTILE_RADIUS, BodyDef.BodyType.DynamicBody);
+        sun = createBody(Constants.entities.SUN_INIT_POS, Constants.entities.SUN_RADIUS, BodyDef.BodyType.StaticBody);
     }
 
     public Vector2 getProjectilePosition() {
         return projectile.getPosition();
+    }
+
+    public Vector2 getSunPosition() {
+        return sun.getPosition();
     }
 
     protected void stepWorld() {
@@ -38,11 +43,12 @@ public class LevelViewModel {
      * Defines a circular body capable of moving in the world.
      * @param position initial x and y coordinates, in meters
      * @param radius circle radius, in meters
+     * @param type the type of body: Static, Dynamic, or Kinematic
      * @return created body
      */
-    private Body createBody(Vector2 position, float radius) {
+    private Body createBody(Vector2 position, float radius, BodyDef.BodyType type) {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.type = type;
         bodyDef.position.set(position.x, position.y);
 
         Body body = world.createBody(bodyDef);

@@ -57,6 +57,9 @@ public class LevelScreen implements Screen, InputProcessor {
         // Draw projectile
         game.shapeRenderer.circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
                 Constants.entities.PROJECTILE_RADIUS);
+        // Draw sun
+        game.shapeRenderer.circle(viewModel.getSunPosition().x, viewModel.getSunPosition().y,
+                Constants.entities.SUN_RADIUS);
         // Draw drag (if occurring)
         if(dragging) {
             game.shapeRenderer.line(dragStart, dragEnd);
