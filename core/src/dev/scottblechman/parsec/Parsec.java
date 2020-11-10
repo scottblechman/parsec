@@ -4,7 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import dev.scottblechman.parsec.screens.LevelScreen;
+import dev.scottblechman.parsec.screens.level.LevelScreen;
 
 public class Parsec extends Game {
 	public SpriteBatch batch;
