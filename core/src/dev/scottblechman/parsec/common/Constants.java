@@ -16,7 +16,8 @@ public class Constants {
 
         private physics() { }
 
-        public static final int FORCE_SCALAR = 20;
+        public static final float FORCE_SCALAR = 20f;
+        public static final float GRAVITY_SCALAR = 10000f;
     }
 
     public static class entities {
