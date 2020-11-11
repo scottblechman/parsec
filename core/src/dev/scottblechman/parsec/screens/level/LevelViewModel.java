@@ -14,7 +14,7 @@ public class LevelViewModel {
     float accumulator = 0;
 
     // Wait to apply gravity until projectile is in motion
-    boolean isShot = false;
+    private boolean projectileInMotion = false;
 
     public LevelViewModel() {
         world = new World(new Vector2(0, 0), true);
@@ -30,6 +30,10 @@ public class LevelViewModel {
         return sun.getPosition();
     }
 
+    public boolean isInMotion() {
+        return projectileInMotion;
+    }
+
     protected void stepWorld() {
         float delta = Gdx.graphics.getDeltaTime();
 
@@ -39,7 +43,7 @@ public class LevelViewModel {
             accumulator -= STEP_TIME;
 
             // Apply forces before stepping world
-            if (isShot) applyGravitationalForce(projectile);
+            if (projectileInMotion) applyGravitationalForce(projectile);
 
             world.step(STEP_TIME, 6, 2);
         }
@@ -79,7 +83,7 @@ public class LevelViewModel {
      * Uses the existing mouse drag information to apply an impulse to the projectile body.
      */
     protected void shootProjectile(Vector2 start, Vector2 end) {
-        isShot = true;
+        projectileInMotion = true;
         float impulseX = start.x - end.x;
         // Assume that start pos y is always >= end pos y
         float impulseY = start.y - end.y;

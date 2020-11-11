@@ -113,11 +113,13 @@ public class LevelScreen implements Screen, InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (button != Input.Buttons.LEFT || pointer > 0) return false;
         camera.unproject(tp.set(screenX, screenY, 0));
-        dragging = true;
-        dragStart.x = screenX;
-        dragEnd.x = screenX;
-        dragStart.y = camera.viewportHeight - screenY;
-        dragEnd.y = camera.viewportHeight - screenY;
+        if(!viewModel.isInMotion()) {
+            dragging = true;
+            dragStart.x = screenX;
+            dragEnd.x = screenX;
+            dragStart.y = camera.viewportHeight - screenY;
+            dragEnd.y = camera.viewportHeight - screenY;
+        }
         return true;
     }
 
@@ -125,8 +127,10 @@ public class LevelScreen implements Screen, InputProcessor {
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         if (button != Input.Buttons.LEFT || pointer > 0) return false;
         camera.unproject(tp.set(screenX, screenY, 0));
-        dragging = false;
-        viewModel.shootProjectile(dragStart, dragEnd);
+        if(!viewModel.isInMotion()) {
+            dragging = false;
+            viewModel.shootProjectile(dragStart, dragEnd);
+        }
         return true;
     }
 
@@ -134,10 +138,12 @@ public class LevelScreen implements Screen, InputProcessor {
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if (!dragging) return false;
         camera.unproject(tp.set(screenX, screenY, 0));
-        dragEnd.x = screenX;
-        // Ensure end point is never higher than start point (pellet never shot negative)
-        if(camera.viewportHeight - screenY < dragStart.y)
-            dragEnd.y = camera.viewportHeight - screenY;
+        if(!viewModel.isInMotion()) {
+            dragEnd.x = screenX;
+            // Ensure end point is never higher than start point (pellet never shot negative)
+            if (camera.viewportHeight - screenY < dragStart.y)
+                dragEnd.y = camera.viewportHeight - screenY;
+        }
         return true;
     }
 
