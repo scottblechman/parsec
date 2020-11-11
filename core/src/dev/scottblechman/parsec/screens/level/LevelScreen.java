@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.util.TextUtils;
 
 public class LevelScreen implements Screen, InputProcessor {
 
@@ -49,10 +50,6 @@ public class LevelScreen implements Screen, InputProcessor {
         game.batch.setProjectionMatrix(camera.combined);
         game.shapeRenderer.setProjectionMatrix(camera.combined);
 
-        game.batch.begin();
-
-        game.batch.end();
-
         game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         // Draw projectile
         game.shapeRenderer.circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
@@ -65,6 +62,10 @@ public class LevelScreen implements Screen, InputProcessor {
             game.shapeRenderer.line(dragStart, dragEnd);
         }
         game.shapeRenderer.end();
+
+        game.batch.begin();
+        game.font.draw(game.batch, "Shots: " + viewModel.getShots(), TextUtils.centerHorizontal(game.font, "Shots: " + viewModel.getShots()), Constants.camera.VIEWPORT_HEIGHT - Constants.camera.MARGIN);
+        game.batch.end();
 
         viewModel.stepWorld();
     }

@@ -10,6 +10,7 @@ public class Constants {
 
         public static final int VIEWPORT_WIDTH = 720;
         public static final int VIEWPORT_HEIGHT = 640;
+        public static final int MARGIN = 16;
     }
 
     public static class physics {

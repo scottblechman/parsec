@@ -16,6 +16,8 @@ public class LevelViewModel {
     // Wait to apply gravity until projectile is in motion
     private boolean projectileInMotion = false;
 
+    private int shotsAttempted = 0;
+
     public LevelViewModel() {
         world = new World(new Vector2(0, 0), true);
         projectile = createBody(Constants.entities.PROJECTILE_INIT_POS, Constants.entities.PROJECTILE_RADIUS, BodyDef.BodyType.DynamicBody);
@@ -32,6 +34,10 @@ public class LevelViewModel {
 
     public boolean isInMotion() {
         return projectileInMotion;
+    }
+
+    public int getShots() {
+        return shotsAttempted;
     }
 
     protected void stepWorld() {
