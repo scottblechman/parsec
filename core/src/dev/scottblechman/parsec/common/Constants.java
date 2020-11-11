@@ -32,4 +32,11 @@ public class Constants {
         public static final Vector2 SUN_INIT_POS = new Vector2((float) camera.VIEWPORT_WIDTH / 2f,
                 (float) camera.VIEWPORT_HEIGHT / 2f);
     }
+
+    public static class game {
+
+        private game() { }
+
+        public static final float PROJECTILE_TIMEOUT = 30f;
+    }
 }

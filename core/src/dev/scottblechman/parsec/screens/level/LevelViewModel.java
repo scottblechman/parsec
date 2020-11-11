@@ -12,6 +12,7 @@ public class LevelViewModel {
 
     final float STEP_TIME = 1f/60f;
     float accumulator = 0;
+    float timeout = 0; // Upper limit on projectile motion
 
     // Wait to apply gravity until projectile is in motion
     private boolean projectileInMotion = false;
@@ -46,12 +47,21 @@ public class LevelViewModel {
         accumulator += Math.min(delta, 0.25f);
 
         while (accumulator >= STEP_TIME) {
-            accumulator -= STEP_TIME;
-
             // Apply forces before stepping world
-            if (projectileInMotion) applyGravitationalForce(projectile);
+            if (projectileInMotion) {
+                // Check if we have gone over the projectile timeout
+                timeout += accumulator;
+                System.out.println(timeout);
+                if(timeout >= Constants.game.PROJECTILE_TIMEOUT) {
+                    reset(true);
+                } else {
+                    applyGravitationalForce(projectile);
+                }
+            }
 
             world.step(STEP_TIME, 6, 2);
+
+            accumulator -= STEP_TIME;
         }
     }
 
@@ -109,5 +119,18 @@ public class LevelViewModel {
         vecDistance.scl((1/magnitude) * radius/distance);
         vecDistance.scl(Constants.physics.FORCE_SCALAR * Constants.physics.GRAVITY_SCALAR);
         body.applyForceToCenter(vecDistance, true);
+    }
+
+    /**
+     * Sets up a new shot after collision or timeout.
+     * @param increment whether to add a shot to the total count
+     */
+    private void reset(boolean increment) {
+        if(increment) {
+            shotsAttempted++;
+        }
+        projectile = createBody(Constants.entities.PROJECTILE_INIT_POS, Constants.entities.PROJECTILE_RADIUS, BodyDef.BodyType.DynamicBody);
+        projectileInMotion = false;
+        timeout = 0;
     }
 }
