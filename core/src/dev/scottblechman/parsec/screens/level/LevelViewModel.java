@@ -3,23 +3,42 @@ package dev.scottblechman.parsec.screens.level;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.listeners.ProjectileListener;
+import dev.scottblechman.parsec.models.enums.EntityType;
+
+import java.util.ArrayList;
 
 public class LevelViewModel {
 
     World world;
-    Body projectile, sun;
+    Body projectile;
+    Body star;
+    ProjectileListener contactListener;
 
-    final float STEP_TIME = 1f/60f;
+    static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
+    float timeout = 0; // Upper limit on projectile motion
 
     // Wait to apply gravity until projectile is in motion
     private boolean projectileInMotion = false;
 
+    private int shotsAttempted = 0;
+
+    private final ArrayList<Body> bodiesToDestroy = new ArrayList<>();
+
+    // Body reset flags
+    private boolean resetProjectile = false;
+
     public LevelViewModel() {
         world = new World(new Vector2(0, 0), true);
-        projectile = createBody(Constants.entities.PROJECTILE_INIT_POS, Constants.entities.PROJECTILE_RADIUS, BodyDef.BodyType.DynamicBody);
-        sun = createBody(Constants.entities.SUN_INIT_POS, Constants.entities.SUN_RADIUS, BodyDef.BodyType.StaticBody);
+        projectile = createBody(Constants.Entities.PROJECTILE_INIT_POS, Constants.Entities.PROJECTILE_RADIUS,
+                BodyDef.BodyType.DynamicBody, true, EntityType.PROJECTILE);
+        star = createBody(Constants.Entities.SUN_INIT_POS, Constants.Entities.SUN_RADIUS, BodyDef.BodyType.StaticBody,
+                false, EntityType.SUN);
+        contactListener = new ProjectileListener(this);
+        world.setContactListener(contactListener);
     }
 
     public Vector2 getProjectilePosition() {
@@ -27,11 +46,16 @@ public class LevelViewModel {
     }
 
     public Vector2 getSunPosition() {
-        return sun.getPosition();
+        return star.getPosition();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isInMotion() {
         return projectileInMotion;
+    }
+
+    public int getShots() {
+        return shotsAttempted;
     }
 
     protected void stepWorld() {
@@ -40,12 +64,43 @@ public class LevelViewModel {
         accumulator += Math.min(delta, 0.25f);
 
         while (accumulator >= STEP_TIME) {
-            accumulator -= STEP_TIME;
-
             // Apply forces before stepping world
-            if (projectileInMotion) applyGravitationalForce(projectile);
+            if (projectileInMotion) {
+                // Check if we have gone over the projectile timeout
+                timeout += accumulator;
+                if(timeout >= Constants.Game.PROJECTILE_TIMEOUT) {
+                    reset(true);
+                } else {
+                    applyGravitationalForce(projectile);
+                }
+            }
 
+            destroyBodies();
+            resetBodies();
             world.step(STEP_TIME, 6, 2);
+
+            accumulator -= STEP_TIME;
+        }
+    }
+
+    /**
+     * Remove any bodies no longer needed before the next world step.
+     */
+    private void destroyBodies() {
+        for(Body b : bodiesToDestroy) {
+            world.destroyBody(b);
+        }
+        bodiesToDestroy.clear();
+    }
+
+    /**
+     * Re-creates any destroyed bodies before the next world step.
+     */
+    private void resetBodies() {
+        if(resetProjectile) {
+            projectile = createBody(Constants.Entities.PROJECTILE_INIT_POS, Constants.Entities.PROJECTILE_RADIUS,
+                    BodyDef.BodyType.DynamicBody, true, EntityType.PROJECTILE);
+            resetProjectile = false;
         }
     }
 
@@ -56,7 +111,7 @@ public class LevelViewModel {
      * @param type the type of body: Static, Dynamic, or Kinematic
      * @return created body
      */
-    private Body createBody(Vector2 position, float radius, BodyDef.BodyType type) {
+    private Body createBody(Vector2 position, float radius, BodyDef.BodyType type, boolean sensor, EntityType gameType) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = type;
         bodyDef.position.set(position.x, position.y);
@@ -72,7 +127,11 @@ public class LevelViewModel {
         fixtureDef.friction = 0f;
         fixtureDef.restitution = 0f;
 
-        Fixture fixture = body.createFixture(fixtureDef);
+        fixtureDef.isSensor = sensor;
+
+        body.createFixture(fixtureDef);
+        body.getFixtureList().get(0).setUserData(gameType);
+        body.setUserData(gameType);
 
         circle.dispose();
 
@@ -87,8 +146,8 @@ public class LevelViewModel {
         float impulseX = start.x - end.x;
         // Assume that start pos y is always >= end pos y
         float impulseY = start.y - end.y;
-        projectile.applyLinearImpulse(Constants.physics.FORCE_SCALAR * impulseX,
-                Constants.physics.FORCE_SCALAR * impulseY, projectile.getPosition().x, projectile.getPosition().y, true);
+        projectile.applyLinearImpulse(Constants.Physics.FORCE_SCALAR * impulseX,
+                Constants.Physics.FORCE_SCALAR * impulseY, projectile.getPosition().x, projectile.getPosition().y, true);
     }
 
     /**
@@ -96,12 +155,36 @@ public class LevelViewModel {
      */
     private void applyGravitationalForce(Body body) {
         float radius = body.getFixtureList().get(0).getShape().getRadius();
-        Vector2 vecDistance = body.getPosition().sub(sun.getPosition());
+        Vector2 vecDistance = body.getPosition().sub(star.getPosition());
         float distance = vecDistance.len();
         vecDistance.scl(-1); // Vector negative
         float magnitude = Math.abs(vecDistance.x) + Math.abs(vecDistance.y);
         vecDistance.scl((1/magnitude) * radius/distance);
-        vecDistance.scl(Constants.physics.FORCE_SCALAR * Constants.physics.GRAVITY_SCALAR);
+        vecDistance.scl(Constants.Physics.FORCE_SCALAR * Constants.Physics.GRAVITY_SCALAR);
         body.applyForceToCenter(vecDistance, true);
+    }
+
+    /**
+     * Sets up a new shot after collision or timeout.
+     * @param increment whether to add a shot to the total count
+     */
+    public void reset(boolean increment) {
+        if(increment) {
+            shotsAttempted++;
+        }
+        Array<Body> bodies = new Array<>();
+        world.getBodies(bodies);
+
+        for (Body b : bodies) {
+            EntityType type = (EntityType) b.getUserData();
+
+            if (type == EntityType.PROJECTILE) {
+                bodiesToDestroy.add(b);
+                break;
+            }
+        }
+        resetProjectile = true;
+        projectileInMotion = false;
+        timeout = 0;
     }
 }

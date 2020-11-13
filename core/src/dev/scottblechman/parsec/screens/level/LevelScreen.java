@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.util.TextUtils;
 
 public class LevelScreen implements Screen, InputProcessor {
 
@@ -28,7 +29,7 @@ public class LevelScreen implements Screen, InputProcessor {
         this.game = game;
 
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, Constants.camera.VIEWPORT_WIDTH, Constants.camera.VIEWPORT_HEIGHT);
+        camera.setToOrtho(false, Constants.Camera.VIEWPORT_WIDTH, Constants.Camera.VIEWPORT_HEIGHT);
 
         viewModel = new LevelViewModel();
 
@@ -46,25 +47,25 @@ public class LevelScreen implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
-        game.shapeRenderer.setProjectionMatrix(camera.combined);
+        game.getSpriteBatch().setProjectionMatrix(camera.combined);
+        game.getShapeRenderer().setProjectionMatrix(camera.combined);
 
-        game.batch.begin();
-
-        game.batch.end();
-
-        game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
         // Draw projectile
-        game.shapeRenderer.circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
-                Constants.entities.PROJECTILE_RADIUS);
+        game.getShapeRenderer().circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
+                Constants.Entities.PROJECTILE_RADIUS);
         // Draw sun
-        game.shapeRenderer.circle(viewModel.getSunPosition().x, viewModel.getSunPosition().y,
-                Constants.entities.SUN_RADIUS);
+        game.getShapeRenderer().circle(viewModel.getSunPosition().x, viewModel.getSunPosition().y,
+                Constants.Entities.SUN_RADIUS);
         // Draw drag (if occurring)
         if(dragging) {
-            game.shapeRenderer.line(dragStart, dragEnd);
+            game.getShapeRenderer().line(dragStart, dragEnd);
         }
-        game.shapeRenderer.end();
+        game.getShapeRenderer().end();
+
+        game.getSpriteBatch().begin();
+        game.getFont().draw(game.getSpriteBatch(), "Shots: " + viewModel.getShots(), TextUtils.centerHorizontal(game.getFont(), "Shots: " + viewModel.getShots()), (float) Constants.Camera.VIEWPORT_HEIGHT - Constants.Camera.MARGIN);
+        game.getSpriteBatch().end();
 
         viewModel.stepWorld();
     }
