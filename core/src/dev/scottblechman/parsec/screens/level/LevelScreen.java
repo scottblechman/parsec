@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.util.TextUtils;
@@ -24,6 +25,7 @@ public class LevelScreen implements Screen, InputProcessor {
     // Starting and ending points of the drag motion
     Vector2 dragStart = new Vector2();
     Vector2 dragEnd = new Vector2();
+    Box2DDebugRenderer debugRenderer;
 
     public LevelScreen(Parsec game) {
         this.game = game;
@@ -39,6 +41,7 @@ public class LevelScreen implements Screen, InputProcessor {
     @Override
     public void show() {
         // Method intentionally left empty.
+        debugRenderer = new Box2DDebugRenderer();
     }
 
     @Override
