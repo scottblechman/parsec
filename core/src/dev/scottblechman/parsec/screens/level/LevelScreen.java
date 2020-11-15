@@ -25,7 +25,14 @@ public class LevelScreen implements Screen, InputProcessor {
     // Starting and ending points of the drag motion
     Vector2 dragStart = new Vector2();
     Vector2 dragEnd = new Vector2();
+
     Box2DDebugRenderer debugRenderer;
+    TextUtils textUtils;
+
+    // Debug flags
+    boolean showWorld = false;
+    boolean show4x4 = false;
+    boolean show3x3 = false;
 
     public LevelScreen(Parsec game) {
         this.game = game;
@@ -42,6 +49,7 @@ public class LevelScreen implements Screen, InputProcessor {
     public void show() {
         // Method intentionally left empty.
         debugRenderer = new Box2DDebugRenderer();
+        this.textUtils = new TextUtils(game.getFont(), game.getSpriteBatch());
     }
 
     @Override
@@ -66,8 +74,22 @@ public class LevelScreen implements Screen, InputProcessor {
         }
         game.getShapeRenderer().end();
 
+        // Debug rendering
+        if(showWorld) {
+            debugRenderer.render(viewModel.world, camera.combined);
+        }
+        game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
+        if(show4x4) {
+            drawGrid(4f);
+        }
+        if(show3x3) {
+            drawGrid(3f);
+        }
+        game.getShapeRenderer().end();
+
         game.getSpriteBatch().begin();
-        game.getFont().draw(game.getSpriteBatch(), "Shots: " + viewModel.getShots(), TextUtils.centerHorizontal(game.getFont(), "Shots: " + viewModel.getShots()), (float) Constants.Camera.VIEWPORT_HEIGHT - Constants.Camera.MARGIN);
+        textUtils.write4x4("Shots:  " + viewModel.getShots(), 1, 3);
+        textUtils.write4x4("System  " + viewModel.getLevelNumber(), 2, 3);
         game.getSpriteBatch().end();
 
         viewModel.stepWorld();
@@ -159,5 +181,17 @@ public class LevelScreen implements Screen, InputProcessor {
     @Override
     public boolean scrolled(int amount) {
         return false;
+    }
+
+    private void drawGrid(float squares) {
+        float segmentWidth = Constants.Camera.VIEWPORT_WIDTH / squares;
+        float segmentHeight = Constants.Camera.VIEWPORT_HEIGHT / squares;
+        for(int i = 0; i < (int) squares; i++) {
+            for(int j = 0; j < (int) squares; j++) {
+                Vector2 start = new Vector2(segmentWidth * i, segmentHeight * j);
+                Vector2 end = new Vector2(start.x + segmentWidth, start.y + segmentHeight);
+                game.getShapeRenderer().rect(start.x, start.y, end.x,  end.y);
+            }
+        }
     }
 }

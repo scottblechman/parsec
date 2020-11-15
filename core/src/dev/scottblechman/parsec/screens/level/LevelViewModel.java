@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
+import dev.scottblechman.parsec.models.Level;
 import dev.scottblechman.parsec.models.Projectile;
 import dev.scottblechman.parsec.models.enums.EntityType;
 import dev.scottblechman.parsec.models.Star;
@@ -18,6 +19,7 @@ public class LevelViewModel {
     Projectile projectile;
     Star star;
     ProjectileListener contactListener;
+    Level level;
 
     static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
@@ -39,6 +41,7 @@ public class LevelViewModel {
         star = new Star(world);
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
+        level = new Level(0);
     }
 
     public Vector2 getProjectilePosition() {
@@ -56,6 +59,10 @@ public class LevelViewModel {
 
     public int getShots() {
         return shotsAttempted;
+    }
+
+    public int getLevelNumber() {
+        return level.getLevelNumber() + 1;
     }
 
     protected void stepWorld() {
