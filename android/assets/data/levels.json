@@ -1,6 +1,8 @@
 [
   {
-    "levelNumber": 0,
     "targetRadius": 100
+  },
+  {
+    "targetRadius": 80
   }
 ]

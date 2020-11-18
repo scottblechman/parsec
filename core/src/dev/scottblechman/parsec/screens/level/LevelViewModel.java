@@ -38,6 +38,7 @@ public class LevelViewModel {
 
     // Body reset flags
     private boolean resetProjectile = false;
+    private boolean resetMoons = false;
 
     public LevelViewModel() {
         levelService = new LevelService();
@@ -125,6 +126,11 @@ public class LevelViewModel {
             projectile = new Projectile(world);
             resetProjectile = false;
         }
+        if(resetMoons) {
+            moons = new ArrayList<>();
+            moons.add(new Moon(world, levelService.getLevelRadius(), true));
+            resetMoons = false;
+        }
     }
 
     /**
@@ -169,9 +175,8 @@ public class LevelViewModel {
         for (Body b : bodies) {
             EntityType type = (EntityType) b.getUserData();
 
-            if (type == EntityType.PROJECTILE) {
+            if (type == EntityType.PROJECTILE || (resetMoons && (type == EntityType.MOON || type == EntityType.TARGET_MOON))) {
                 bodiesToDestroy.add(b);
-                break;
             }
         }
         resetProjectile = true;
@@ -184,6 +189,7 @@ public class LevelViewModel {
      */
     public void nextLevel() {
         reset(false);
+        resetMoons = true;
         levelService.nextLevel();
     }
 }
