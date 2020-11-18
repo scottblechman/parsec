@@ -7,17 +7,20 @@ import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
 import dev.scottblechman.parsec.models.Level;
+import dev.scottblechman.parsec.models.Moon;
 import dev.scottblechman.parsec.models.Projectile;
 import dev.scottblechman.parsec.models.enums.EntityType;
 import dev.scottblechman.parsec.models.Star;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class LevelViewModel {
 
     World world;
     Projectile projectile;
     Star star;
+    ArrayList<Moon> moons;
     ProjectileListener contactListener;
     Level level;
 
@@ -39,6 +42,8 @@ public class LevelViewModel {
         world = new World(new Vector2(0, 0), true);
         projectile = new Projectile(world);
         star = new Star(world);
+        moons = new ArrayList<>();
+        moons.add(new Moon(world, 100, true));
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
         level = new Level(0);
@@ -65,6 +70,10 @@ public class LevelViewModel {
         return level.getLevelNumber() + 1;
     }
 
+    public List<Moon> getMoons() {
+        return moons;
+    }
+
     protected void stepWorld() {
         float delta = Gdx.graphics.getDeltaTime();
 
@@ -84,6 +93,9 @@ public class LevelViewModel {
 
             destroyBodies();
             resetBodies();
+            for(Moon moon : moons) {
+                moon.update();
+            }
             world.step(STEP_TIME, 6, 2);
 
             accumulator -= STEP_TIME;

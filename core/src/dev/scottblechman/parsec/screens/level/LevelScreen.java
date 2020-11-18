@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.models.Moon;
 import dev.scottblechman.parsec.util.TextUtils;
 
 public class LevelScreen implements Screen, InputProcessor {
@@ -71,6 +72,9 @@ public class LevelScreen implements Screen, InputProcessor {
         // Draw drag (if occurring)
         if(dragging) {
             game.getShapeRenderer().line(dragStart, dragEnd);
+        }
+        for(Moon moon : viewModel.getMoons()) {
+            game.getShapeRenderer().circle(moon.getPosition().x, moon.getPosition().y, Constants.Entities.MOON_RADIUS);
         }
         game.getShapeRenderer().end();
 
