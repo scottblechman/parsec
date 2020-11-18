@@ -12,7 +12,7 @@ public class ScreenNavigation {
 
     public ScreenNavigation(Parsec game) {
         this.game = game;
-        this.state = ScreenState.GAME;
+        this.state = ScreenState.SCORE;
         changeScreen();
     }
 
@@ -31,7 +31,7 @@ public class ScreenNavigation {
                 game.setScreen(new LevelScreen(game));
                 break;
             case SCORE:
-                game.setScreen(new ScoreScreen());
+                game.setScreen(new ScoreScreen(game));
                 break;
             default:
                 break;

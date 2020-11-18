@@ -100,8 +100,8 @@ public class LevelScreen implements Screen, InputProcessor {
         game.getShapeRenderer().end();
 
         game.getSpriteBatch().begin();
-        textUtils.write4x4("Shots:  " + viewModel.getShots(), 1, 3);
-        textUtils.write4x4("System  " + viewModel.getLevelNumber(), 2, 3);
+        textUtils.writeGrid("Shots:  " + viewModel.getShots(), 4, 1, 3);
+        textUtils.writeGrid("System  " + viewModel.getLevelNumber(), 4, 2, 3);
         game.getSpriteBatch().end();
 
         viewModel.stepWorld();

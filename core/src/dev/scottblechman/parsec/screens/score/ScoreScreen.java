@@ -4,17 +4,45 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import dev.scottblechman.parsec.Parsec;
+import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.util.TextUtils;
 
 public class ScoreScreen implements Screen, InputProcessor {
+
+    private final Parsec game;
+    private final OrthographicCamera camera;
+
+    private TextUtils textUtils;
+
+    public ScoreScreen(Parsec game) {
+        this.game = game;
+
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, Constants.Camera.VIEWPORT_WIDTH, Constants.Camera.VIEWPORT_HEIGHT);
+
+        Gdx.input.setInputProcessor(this);
+    }
+
     @Override
     public void show() {
-        // Intentionally left empty
+        this.textUtils = new TextUtils(game.getFont(), game.getSpriteBatch());
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        camera.update();
+        game.getSpriteBatch().begin();
+        textUtils.writeGrid("GAME OVER", 5, 2, 4);
+        textUtils.writeGrid("TOTAL SCORE:", 11, 5, 1);
+
+        textUtils.writeGrid("PLAY AGAIN", 7, 2, 0);
+        textUtils.writeGrid("QUIT", 7, 4, 0);
+        game.getSpriteBatch().end();
     }
 
     @Override
