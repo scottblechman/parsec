@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.data.LevelService;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
-import dev.scottblechman.parsec.models.Level;
 import dev.scottblechman.parsec.models.Moon;
 import dev.scottblechman.parsec.models.Projectile;
 import dev.scottblechman.parsec.models.enums.EntityType;
@@ -47,6 +46,9 @@ public class LevelViewModel {
         star = new Star(world);
         moons = new ArrayList<>();
         moons.add(new Moon(world, levelService.getLevelRadius(), true));
+        for(int i = 0; i < levelService.getMoonRadii().length; i++) {
+            moons.add(new Moon(world, levelService.getMoonRadius(i), false));
+        }
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
     }
@@ -129,6 +131,9 @@ public class LevelViewModel {
         if(resetMoons) {
             moons = new ArrayList<>();
             moons.add(new Moon(world, levelService.getLevelRadius(), true));
+            for(int i = 0; i < levelService.getMoonRadii().length; i++) {
+                moons.add(new Moon(world, levelService.getMoonRadius(i), false));
+            }
             resetMoons = false;
         }
     }
@@ -188,8 +193,10 @@ public class LevelViewModel {
      * Advances the level after the target moon has been hit.
      */
     public void nextLevel() {
-        reset(false);
-        resetMoons = true;
-        levelService.nextLevel();
+        if(!levelService.lastLevel()) {
+            reset(false);
+            resetMoons = true;
+            levelService.nextLevel();
+        }
     }
 }
