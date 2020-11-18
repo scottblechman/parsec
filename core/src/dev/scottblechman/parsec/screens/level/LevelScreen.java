@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.models.Moon;
+import dev.scottblechman.parsec.models.enums.EntityType;
 import dev.scottblechman.parsec.util.TextUtils;
 
 public class LevelScreen implements Screen, InputProcessor {
@@ -74,7 +76,13 @@ public class LevelScreen implements Screen, InputProcessor {
             game.getShapeRenderer().line(dragStart, dragEnd);
         }
         for(Moon moon : viewModel.getMoons()) {
+            if(moon.getType() == EntityType.TARGET_MOON) {
+                game.getShapeRenderer().setColor(Color.GOLDENROD);
+            }
             game.getShapeRenderer().circle(moon.getPosition().x, moon.getPosition().y, Constants.Entities.MOON_RADIUS);
+            if(moon.getType() == EntityType.TARGET_MOON) {
+                game.getShapeRenderer().setColor(Color.WHITE);
+            }
         }
         game.getShapeRenderer().end();
 
@@ -121,7 +129,8 @@ public class LevelScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-        // Method intentionally left empty.
+        debugRenderer.dispose();
+        viewModel.dispose();
     }
 
     @Override

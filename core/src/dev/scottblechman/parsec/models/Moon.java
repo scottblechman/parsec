@@ -71,8 +71,14 @@ public class Moon implements IEntity {
         return entity.getBody().getPosition();
     }
 
+    public EntityType getType() {
+        return entity.getEntityType();
+    }
+
     public void update() {
         direction = entity.getBody().getPosition().sub(pivotPoint).rotate(90).nor();
-        entity.getBody().applyForceToCenter(direction.cpy().scl(radius * Constants.Physics.MOON_FORCE_SCALAR), true);
+        float scalar = radius;
+        scalar *= Constants.Game.DEBUG_MODE ? 1 : Constants.Physics.MOON_FORCE_SCALAR;
+        entity.getBody().applyForceToCenter(direction.cpy().scl(scalar), true);
     }
 }

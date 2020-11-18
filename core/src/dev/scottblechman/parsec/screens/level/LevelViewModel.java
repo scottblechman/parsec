@@ -74,6 +74,10 @@ public class LevelViewModel {
         return moons;
     }
 
+    public void dispose() {
+        world.dispose();
+    }
+
     protected void stepWorld() {
         float delta = Gdx.graphics.getDeltaTime();
 
@@ -155,6 +159,8 @@ public class LevelViewModel {
     public void reset(boolean increment) {
         if(increment) {
             shotsAttempted++;
+        } else {
+            shotsAttempted = 0;
         }
         Array<Body> bodies = new Array<>();
         world.getBodies(bodies);
@@ -170,5 +176,13 @@ public class LevelViewModel {
         resetProjectile = true;
         projectileInMotion = false;
         timeout = 0;
+    }
+
+    /**
+     * Advances the level after the target moon has been hit.
+     */
+    public void nextLevel() {
+        reset(false);
+        level = new Level(level.getLevelNumber() + 1);
     }
 }

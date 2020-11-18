@@ -19,7 +19,11 @@ public class ProjectileListener implements ContactListener {
     public void beginContact(Contact contact) {
         switch((EntityType) contact.getFixtureB().getUserData()) {
             case SUN:
+            case MOON:
                 viewModel.reset(true);
+                break;
+            case TARGET_MOON:
+                viewModel.nextLevel();
                 break;
             case PROJECTILE:
             case UNDEFINED:

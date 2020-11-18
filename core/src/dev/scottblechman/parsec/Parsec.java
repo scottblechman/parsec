@@ -25,6 +25,7 @@ public class Parsec extends Game {
 		batch.dispose();
 		font.dispose();
 		shapeRenderer.dispose();
+		this.screen.dispose();
 	}
 
 	public SpriteBatch getSpriteBatch() {
