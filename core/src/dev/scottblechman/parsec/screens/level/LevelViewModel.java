@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.data.LevelService;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
 import dev.scottblechman.parsec.models.Level;
 import dev.scottblechman.parsec.models.Moon;
@@ -22,7 +23,7 @@ public class LevelViewModel {
     Star star;
     ArrayList<Moon> moons;
     ProjectileListener contactListener;
-    Level level;
+    LevelService levelService;
 
     static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
@@ -39,14 +40,14 @@ public class LevelViewModel {
     private boolean resetProjectile = false;
 
     public LevelViewModel() {
+        levelService = new LevelService();
         world = new World(new Vector2(0, 0), true);
         projectile = new Projectile(world);
         star = new Star(world);
         moons = new ArrayList<>();
-        moons.add(new Moon(world, 100, true));
+        moons.add(new Moon(world, levelService.getLevelRadius(), true));
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
-        level = new Level(0);
     }
 
     public Vector2 getProjectilePosition() {
@@ -67,7 +68,7 @@ public class LevelViewModel {
     }
 
     public int getLevelNumber() {
-        return level.getLevelNumber() + 1;
+        return levelService.getLevelNumber();
     }
 
     public List<Moon> getMoons() {
@@ -183,6 +184,6 @@ public class LevelViewModel {
      */
     public void nextLevel() {
         reset(false);
-        level = new Level(level.getLevelNumber() + 1);
+        levelService.nextLevel();
     }
 }

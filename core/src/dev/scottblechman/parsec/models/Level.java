@@ -1,13 +1,10 @@
 package dev.scottblechman.parsec.models;
 
 public class Level {
-    private final int levelNumber;
+    public int levelNumber;
+    public int targetRadius;
 
-    public Level(int number) {
-        this.levelNumber = number;
-    }
-
-    public int getLevelNumber() {
-        return levelNumber;
+    public Level() {
+        // Intentionally left empty for JSON de-serialization
     }
 }
