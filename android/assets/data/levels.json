@@ -1,0 +1,9 @@
+[
+  {
+    "targetRadius": 100
+  },
+  {
+    "targetRadius": 80,
+    "moons": [120]
+  }
+]

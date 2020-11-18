@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.data.LevelService;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
-import dev.scottblechman.parsec.models.Level;
 import dev.scottblechman.parsec.models.Moon;
 import dev.scottblechman.parsec.models.Projectile;
 import dev.scottblechman.parsec.models.enums.EntityType;
@@ -22,7 +22,7 @@ public class LevelViewModel {
     Star star;
     ArrayList<Moon> moons;
     ProjectileListener contactListener;
-    Level level;
+    LevelService levelService;
 
     static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
@@ -37,16 +37,20 @@ public class LevelViewModel {
 
     // Body reset flags
     private boolean resetProjectile = false;
+    private boolean resetMoons = false;
 
     public LevelViewModel() {
+        levelService = new LevelService();
         world = new World(new Vector2(0, 0), true);
         projectile = new Projectile(world);
         star = new Star(world);
         moons = new ArrayList<>();
-        moons.add(new Moon(world, 100, true));
+        moons.add(new Moon(world, levelService.getLevelRadius(), true));
+        for(int i = 0; i < levelService.getMoonRadii().length; i++) {
+            moons.add(new Moon(world, levelService.getMoonRadius(i), false));
+        }
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
-        level = new Level(0);
     }
 
     public Vector2 getProjectilePosition() {
@@ -67,7 +71,7 @@ public class LevelViewModel {
     }
 
     public int getLevelNumber() {
-        return level.getLevelNumber() + 1;
+        return levelService.getLevelNumber();
     }
 
     public List<Moon> getMoons() {
@@ -124,6 +128,14 @@ public class LevelViewModel {
             projectile = new Projectile(world);
             resetProjectile = false;
         }
+        if(resetMoons) {
+            moons = new ArrayList<>();
+            moons.add(new Moon(world, levelService.getLevelRadius(), true));
+            for(int i = 0; i < levelService.getMoonRadii().length; i++) {
+                moons.add(new Moon(world, levelService.getMoonRadius(i), false));
+            }
+            resetMoons = false;
+        }
     }
 
     /**
@@ -168,9 +180,8 @@ public class LevelViewModel {
         for (Body b : bodies) {
             EntityType type = (EntityType) b.getUserData();
 
-            if (type == EntityType.PROJECTILE) {
+            if (type == EntityType.PROJECTILE || (resetMoons && (type == EntityType.MOON || type == EntityType.TARGET_MOON))) {
                 bodiesToDestroy.add(b);
-                break;
             }
         }
         resetProjectile = true;
@@ -182,7 +193,10 @@ public class LevelViewModel {
      * Advances the level after the target moon has been hit.
      */
     public void nextLevel() {
-        reset(false);
-        level = new Level(level.getLevelNumber() + 1);
+        if(!levelService.lastLevel()) {
+            reset(false);
+            resetMoons = true;
+            levelService.nextLevel();
+        }
     }
 }
