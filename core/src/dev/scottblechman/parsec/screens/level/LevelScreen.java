@@ -4,13 +4,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.models.Moon;
+import dev.scottblechman.parsec.models.enums.EntityType;
 import dev.scottblechman.parsec.util.TextUtils;
 
 public class LevelScreen implements Screen, InputProcessor {
@@ -24,6 +28,14 @@ public class LevelScreen implements Screen, InputProcessor {
     // Starting and ending points of the drag motion
     Vector2 dragStart = new Vector2();
     Vector2 dragEnd = new Vector2();
+
+    Box2DDebugRenderer debugRenderer;
+    TextUtils textUtils;
+
+    // Debug flags
+    boolean showWorld = false;
+    boolean show4x4 = false;
+    boolean show3x3 = false;
 
     public LevelScreen(Parsec game) {
         this.game = game;
@@ -39,6 +51,8 @@ public class LevelScreen implements Screen, InputProcessor {
     @Override
     public void show() {
         // Method intentionally left empty.
+        debugRenderer = new Box2DDebugRenderer();
+        this.textUtils = new TextUtils(game.getFont(), game.getSpriteBatch());
     }
 
     @Override
@@ -61,10 +75,33 @@ public class LevelScreen implements Screen, InputProcessor {
         if(dragging) {
             game.getShapeRenderer().line(dragStart, dragEnd);
         }
+        for(Moon moon : viewModel.getMoons()) {
+            if(moon.getType() == EntityType.TARGET_MOON) {
+                game.getShapeRenderer().setColor(Color.GOLDENROD);
+            }
+            game.getShapeRenderer().circle(moon.getPosition().x, moon.getPosition().y, Constants.Entities.MOON_RADIUS);
+            if(moon.getType() == EntityType.TARGET_MOON) {
+                game.getShapeRenderer().setColor(Color.WHITE);
+            }
+        }
+        game.getShapeRenderer().end();
+
+        // Debug rendering
+        if(showWorld) {
+            debugRenderer.render(viewModel.world, camera.combined);
+        }
+        game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
+        if(show4x4) {
+            drawGrid(4f);
+        }
+        if(show3x3) {
+            drawGrid(3f);
+        }
         game.getShapeRenderer().end();
 
         game.getSpriteBatch().begin();
-        game.getFont().draw(game.getSpriteBatch(), "Shots: " + viewModel.getShots(), TextUtils.centerHorizontal(game.getFont(), "Shots: " + viewModel.getShots()), (float) Constants.Camera.VIEWPORT_HEIGHT - Constants.Camera.MARGIN);
+        textUtils.write4x4("Shots:  " + viewModel.getShots(), 1, 3);
+        textUtils.write4x4("System  " + viewModel.getLevelNumber(), 2, 3);
         game.getSpriteBatch().end();
 
         viewModel.stepWorld();
@@ -92,7 +129,8 @@ public class LevelScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-        // Method intentionally left empty.
+        debugRenderer.dispose();
+        viewModel.dispose();
     }
 
     @Override
@@ -156,5 +194,17 @@ public class LevelScreen implements Screen, InputProcessor {
     @Override
     public boolean scrolled(int amount) {
         return false;
+    }
+
+    private void drawGrid(float squares) {
+        float segmentWidth = Constants.Camera.VIEWPORT_WIDTH / squares;
+        float segmentHeight = Constants.Camera.VIEWPORT_HEIGHT / squares;
+        for(int i = 0; i < (int) squares; i++) {
+            for(int j = 0; j < (int) squares; j++) {
+                Vector2 start = new Vector2(segmentWidth * i, segmentHeight * j);
+                Vector2 end = new Vector2(start.x + segmentWidth, start.y + segmentHeight);
+                game.getShapeRenderer().rect(start.x, start.y, end.x,  end.y);
+            }
+        }
     }
 }

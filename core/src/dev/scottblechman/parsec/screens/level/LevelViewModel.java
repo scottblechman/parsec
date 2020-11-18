@@ -6,16 +6,23 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
+import dev.scottblechman.parsec.models.Level;
+import dev.scottblechman.parsec.models.Moon;
+import dev.scottblechman.parsec.models.Projectile;
 import dev.scottblechman.parsec.models.enums.EntityType;
+import dev.scottblechman.parsec.models.Star;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class LevelViewModel {
 
     World world;
-    Body projectile;
-    Body star;
+    Projectile projectile;
+    Star star;
+    ArrayList<Moon> moons;
     ProjectileListener contactListener;
+    Level level;
 
     static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
@@ -33,12 +40,13 @@ public class LevelViewModel {
 
     public LevelViewModel() {
         world = new World(new Vector2(0, 0), true);
-        projectile = createBody(Constants.Entities.PROJECTILE_INIT_POS, Constants.Entities.PROJECTILE_RADIUS,
-                BodyDef.BodyType.DynamicBody, true, EntityType.PROJECTILE);
-        star = createBody(Constants.Entities.SUN_INIT_POS, Constants.Entities.SUN_RADIUS, BodyDef.BodyType.StaticBody,
-                false, EntityType.SUN);
+        projectile = new Projectile(world);
+        star = new Star(world);
+        moons = new ArrayList<>();
+        moons.add(new Moon(world, 100, true));
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
+        level = new Level(0);
     }
 
     public Vector2 getProjectilePosition() {
@@ -58,6 +66,18 @@ public class LevelViewModel {
         return shotsAttempted;
     }
 
+    public int getLevelNumber() {
+        return level.getLevelNumber() + 1;
+    }
+
+    public List<Moon> getMoons() {
+        return moons;
+    }
+
+    public void dispose() {
+        world.dispose();
+    }
+
     protected void stepWorld() {
         float delta = Gdx.graphics.getDeltaTime();
 
@@ -71,12 +91,15 @@ public class LevelViewModel {
                 if(timeout >= Constants.Game.PROJECTILE_TIMEOUT) {
                     reset(true);
                 } else {
-                    applyGravitationalForce(projectile);
+                    applyGravitationalForce(projectile.getBody());
                 }
             }
 
             destroyBodies();
             resetBodies();
+            for(Moon moon : moons) {
+                moon.update();
+            }
             world.step(STEP_TIME, 6, 2);
 
             accumulator -= STEP_TIME;
@@ -98,44 +121,9 @@ public class LevelViewModel {
      */
     private void resetBodies() {
         if(resetProjectile) {
-            projectile = createBody(Constants.Entities.PROJECTILE_INIT_POS, Constants.Entities.PROJECTILE_RADIUS,
-                    BodyDef.BodyType.DynamicBody, true, EntityType.PROJECTILE);
+            projectile = new Projectile(world);
             resetProjectile = false;
         }
-    }
-
-    /**
-     * Defines a circular body capable of moving in the world.
-     * @param position initial x and y coordinates, in meters
-     * @param radius circle radius, in meters
-     * @param type the type of body: Static, Dynamic, or Kinematic
-     * @return created body
-     */
-    private Body createBody(Vector2 position, float radius, BodyDef.BodyType type, boolean sensor, EntityType gameType) {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = type;
-        bodyDef.position.set(position.x, position.y);
-
-        Body body = world.createBody(bodyDef);
-
-        CircleShape circle = new CircleShape();
-        circle.setRadius(radius);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = circle;
-        fixtureDef.density = 1f;
-        fixtureDef.friction = 0f;
-        fixtureDef.restitution = 0f;
-
-        fixtureDef.isSensor = sensor;
-
-        body.createFixture(fixtureDef);
-        body.getFixtureList().get(0).setUserData(gameType);
-        body.setUserData(gameType);
-
-        circle.dispose();
-
-        return body;
     }
 
     /**
@@ -146,7 +134,7 @@ public class LevelViewModel {
         float impulseX = start.x - end.x;
         // Assume that start pos y is always >= end pos y
         float impulseY = start.y - end.y;
-        projectile.applyLinearImpulse(Constants.Physics.FORCE_SCALAR * impulseX,
+        projectile.getBody().applyLinearImpulse(Constants.Physics.FORCE_SCALAR * impulseX,
                 Constants.Physics.FORCE_SCALAR * impulseY, projectile.getPosition().x, projectile.getPosition().y, true);
     }
 
@@ -171,6 +159,8 @@ public class LevelViewModel {
     public void reset(boolean increment) {
         if(increment) {
             shotsAttempted++;
+        } else {
+            shotsAttempted = 0;
         }
         Array<Body> bodies = new Array<>();
         world.getBodies(bodies);
@@ -186,5 +176,13 @@ public class LevelViewModel {
         resetProjectile = true;
         projectileInMotion = false;
         timeout = 0;
+    }
+
+    /**
+     * Advances the level after the target moon has been hit.
+     */
+    public void nextLevel() {
+        reset(false);
+        level = new Level(level.getLevelNumber() + 1);
     }
 }

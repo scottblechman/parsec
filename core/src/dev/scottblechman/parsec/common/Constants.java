@@ -20,6 +20,7 @@ public class Constants {
         private Physics() { }
 
         public static final float FORCE_SCALAR = 15f;
+        public static final float MOON_FORCE_SCALAR = 1000f;
         public static final float GRAVITY_SCALAR = 10000f;
     }
 
@@ -33,6 +34,7 @@ public class Constants {
         public static final int SUN_RADIUS = 32;
         public static final Vector2 SUN_INIT_POS = new Vector2((float) Camera.VIEWPORT_WIDTH / 2f,
                 (float) Camera.VIEWPORT_HEIGHT / 2f);
+        public static final int MOON_RADIUS = 4;
     }
 
     public static class Game {
@@ -40,5 +42,6 @@ public class Constants {
         private Game() { }
 
         public static final float PROJECTILE_TIMEOUT = 30f;
+        public static final boolean DEBUG_MODE = false;
     }
 }
