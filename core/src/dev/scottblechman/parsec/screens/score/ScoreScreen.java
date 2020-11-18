@@ -38,8 +38,8 @@ public class ScoreScreen implements Screen, InputProcessor {
         camera.update();
         game.getSpriteBatch().begin();
         textUtils.writeGrid("GAME OVER", 5, 2, 4);
-        textUtils.writeGrid("TOTAL SCORE:", 11, 5, 1);
-
+        textUtils.writeGrid("TOTAL SCORE: " + game.getScoreService().getTotal(), 11, 5, 1);
+        textUtils.writeList(makeScoreList());
         textUtils.writeGrid("PLAY AGAIN", 7, 2, 0);
         textUtils.writeGrid("QUIT", 7, 4, 0);
         game.getSpriteBatch().end();
@@ -68,6 +68,14 @@ public class ScoreScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         // Intentionally left empty
+    }
+
+    private String[] makeScoreList() {
+        String[] scoreLines = new String[game.getScoreService().getScores().size()];
+        for(int i = 0; i < game.getScoreService().getScores().size(); i++) {
+            scoreLines[i] = "SYSTEM " + (i + 1) + ": " + game.getScoreService().getScores().get(i);
+        }
+        return scoreLines;
     }
 
     @Override

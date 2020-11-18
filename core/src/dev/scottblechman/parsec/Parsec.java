@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import dev.scottblechman.parsec.state.ScoreService;
 import dev.scottblechman.parsec.state.ScreenNavigation;
 import dev.scottblechman.parsec.state.enums.ScreenState;
 
@@ -14,6 +15,7 @@ public class Parsec extends Game {
 	private ShapeRenderer shapeRenderer;
 
 	private ScreenNavigation navigator;
+	private ScoreService scoreService;
 
 	@Override
 	public void create () {
@@ -21,6 +23,7 @@ public class Parsec extends Game {
 		font = new BitmapFont(Gdx.files.internal("font/kenney_future.fnt"));
 		shapeRenderer = new ShapeRenderer();
 
+		scoreService = new ScoreService();
 		navigator = new ScreenNavigation(this);
 	}
 
@@ -42,6 +45,10 @@ public class Parsec extends Game {
 
 	public ShapeRenderer getShapeRenderer() {
 		return shapeRenderer;
+	}
+
+	public ScoreService getScoreService() {
+		return scoreService;
 	}
 
 	public void navigateTo(ScreenState nextScreen) {

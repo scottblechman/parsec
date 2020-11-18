@@ -197,6 +197,7 @@ public class LevelViewModel {
      * Advances the level after the target moon has been hit.
      */
     public void nextLevel() {
+        game.getScoreService().writeScore(levelService.getLevelNumber() - 1, shotsAttempted + 1);
         if(levelService.lastLevel()) {
             game.navigateTo(ScreenState.SCORE);
         } else {
