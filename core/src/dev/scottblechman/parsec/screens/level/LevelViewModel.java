@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.data.LevelService;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
@@ -11,6 +12,7 @@ import dev.scottblechman.parsec.models.Moon;
 import dev.scottblechman.parsec.models.Projectile;
 import dev.scottblechman.parsec.models.enums.EntityType;
 import dev.scottblechman.parsec.models.Star;
+import dev.scottblechman.parsec.state.enums.ScreenState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,7 @@ public class LevelViewModel {
     ArrayList<Moon> moons;
     ProjectileListener contactListener;
     LevelService levelService;
+    Parsec game;
 
     static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
@@ -39,7 +42,7 @@ public class LevelViewModel {
     private boolean resetProjectile = false;
     private boolean resetMoons = false;
 
-    public LevelViewModel() {
+    public LevelViewModel(Parsec game) {
         levelService = new LevelService();
         world = new World(new Vector2(0, 0), true);
         projectile = new Projectile(world);
@@ -51,6 +54,7 @@ public class LevelViewModel {
         }
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
+        this.game = game;
     }
 
     public Vector2 getProjectilePosition() {
@@ -193,7 +197,9 @@ public class LevelViewModel {
      * Advances the level after the target moon has been hit.
      */
     public void nextLevel() {
-        if(!levelService.lastLevel()) {
+        if(levelService.lastLevel()) {
+            game.navigateTo(ScreenState.SCORE);
+        } else {
             reset(false);
             resetMoons = true;
             levelService.nextLevel();

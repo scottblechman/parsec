@@ -43,7 +43,7 @@ public class LevelScreen implements Screen, InputProcessor {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.Camera.VIEWPORT_WIDTH, Constants.Camera.VIEWPORT_HEIGHT);
 
-        viewModel = new LevelViewModel();
+        viewModel = new LevelViewModel(game);
 
         Gdx.input.setInputProcessor(this);
     }
