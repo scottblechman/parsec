@@ -43,7 +43,7 @@ public class LevelScreen implements Screen, InputProcessor {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.Camera.VIEWPORT_WIDTH, Constants.Camera.VIEWPORT_HEIGHT);
 
-        viewModel = new LevelViewModel();
+        viewModel = new LevelViewModel(game);
 
         Gdx.input.setInputProcessor(this);
     }
@@ -100,8 +100,8 @@ public class LevelScreen implements Screen, InputProcessor {
         game.getShapeRenderer().end();
 
         game.getSpriteBatch().begin();
-        textUtils.write4x4("Shots:  " + viewModel.getShots(), 1, 3);
-        textUtils.write4x4("System  " + viewModel.getLevelNumber(), 2, 3);
+        textUtils.writeGrid("SHOTS:  " + viewModel.getShots(), 4, 1, 3);
+        textUtils.writeGrid("SYSTEM  " + viewModel.getLevelNumber(), 4, 2, 3);
         game.getSpriteBatch().end();
 
         viewModel.stepWorld();
@@ -164,7 +164,7 @@ public class LevelScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (button != Input.Buttons.LEFT || pointer > 0) return false;
+        if (button != Input.Buttons.LEFT || pointer > 0 || !dragging) return false;
         camera.unproject(tp.set(screenX, screenY, 0));
         if(!viewModel.isInMotion()) {
             dragging = false;
