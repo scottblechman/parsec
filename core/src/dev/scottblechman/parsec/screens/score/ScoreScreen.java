@@ -5,8 +5,12 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.common.components.Button;
+import dev.scottblechman.parsec.state.enums.ScreenState;
 import dev.scottblechman.parsec.util.TextUtils;
 
 public class ScoreScreen implements Screen, InputProcessor {
@@ -16,11 +20,19 @@ public class ScoreScreen implements Screen, InputProcessor {
 
     private TextUtils textUtils;
 
+    private final Button newGameButton;
+    private final Button quitButton;
+
+    Vector3 tp = new Vector3();
+
     public ScoreScreen(Parsec game) {
         this.game = game;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.Camera.VIEWPORT_WIDTH, Constants.Camera.VIEWPORT_HEIGHT);
+
+        newGameButton = new Button("NEW GAME", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 3f, Constants.Camera.VIEWPORT_HEIGHT / 11f), game.getFont());
+        quitButton = new Button("QUIT", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 1.5f, Constants.Camera.VIEWPORT_HEIGHT / 11f), game.getFont());
 
         Gdx.input.setInputProcessor(this);
     }
@@ -40,8 +52,8 @@ public class ScoreScreen implements Screen, InputProcessor {
         textUtils.writeGrid("GAME OVER", 5, 2, 4);
         textUtils.writeGrid("TOTAL SCORE: " + game.getScoreService().getTotal(), 11, 5, 1);
         textUtils.writeList(makeScoreList());
-        textUtils.writeGrid("PLAY AGAIN", 7, 2, 0);
-        textUtils.writeGrid("QUIT", 7, 4, 0);
+        newGameButton.draw(game.getSpriteBatch());
+        quitButton.draw(game.getSpriteBatch());
         game.getSpriteBatch().end();
     }
 
@@ -95,7 +107,13 @@ public class ScoreScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
+        camera.unproject(tp.set(screenX, screenY, 0));
+        if(newGameButton.getBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+            game.navigateTo(ScreenState.GAME);
+        } else if(quitButton.getBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+            Gdx.app.exit();
+        }
+        return true;
     }
 
     @Override
