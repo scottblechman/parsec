@@ -164,7 +164,7 @@ public class LevelScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (button != Input.Buttons.LEFT || pointer > 0) return false;
+        if (button != Input.Buttons.LEFT || pointer > 0 || !dragging) return false;
         camera.unproject(tp.set(screenX, screenY, 0));
         if(!viewModel.isInMotion()) {
             dragging = false;

@@ -2,6 +2,7 @@ package dev.scottblechman.parsec.state;
 
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.screens.level.LevelScreen;
+import dev.scottblechman.parsec.screens.menu.MenuScreen;
 import dev.scottblechman.parsec.screens.score.ScoreScreen;
 import dev.scottblechman.parsec.state.enums.ScreenState;
 
@@ -12,7 +13,7 @@ public class ScreenNavigation {
 
     public ScreenNavigation(Parsec game) {
         this.game = game;
-        this.state = ScreenState.GAME;
+        this.state = ScreenState.MENU;
         changeScreen();
     }
 
@@ -27,6 +28,9 @@ public class ScreenNavigation {
 
     public void changeScreen() {
         switch (state) {
+            case MENU:
+                game.setScreen(new MenuScreen(game));
+                break;
             case GAME:
                 game.setScreen(new LevelScreen(game));
                 break;
