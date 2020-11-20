@@ -30,11 +30,15 @@ public class Constants {
 
         public static final int PROJECTILE_RADIUS = 4;
         public static final Vector2 PROJECTILE_INIT_POS = new Vector2((float) Camera.VIEWPORT_WIDTH / 2f,
-                (float) Camera.VIEWPORT_HEIGHT / 4f);
+                (float) Camera.VIEWPORT_HEIGHT / 5f);
         public static final int SUN_RADIUS = 32;
         public static final Vector2 SUN_INIT_POS = new Vector2((float) Camera.VIEWPORT_WIDTH / 2f,
                 (float) Camera.VIEWPORT_HEIGHT / 2f);
         public static final int MOON_RADIUS = 4;
+        public static final Vector2 BARRIER_INIT_POS = new Vector2((float) Camera.VIEWPORT_WIDTH / 2f,
+                (float) Camera.VIEWPORT_HEIGHT / 4f);
+        public static final int BARRIER_WIDTH = 40;
+        public static final int BARRIER_HEIGHT = BARRIER_WIDTH / 4;
     }
 
     public static class Game {

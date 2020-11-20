@@ -33,7 +33,6 @@ public class LevelScreen implements Screen, InputProcessor {
     TextUtils textUtils;
 
     // Debug flags
-    boolean showWorld = false;
     boolean show4x4 = false;
     boolean show3x3 = false;
 
@@ -84,10 +83,14 @@ public class LevelScreen implements Screen, InputProcessor {
                 game.getShapeRenderer().setColor(Color.WHITE);
             }
         }
+        // Draw barrier
+        game.getShapeRenderer().rect(viewModel.getBarrier().getPosition().x - (viewModel.getBarrier().getWidth() / 2),
+                viewModel.getBarrier().getPosition().y - (viewModel.getBarrier().getHeight() / 2),
+                viewModel.getBarrier().getWidth(), viewModel.getBarrier().getHeight());
         game.getShapeRenderer().end();
 
         // Debug rendering
-        if(showWorld) {
+        if(Constants.Game.DEBUG_MODE) {
             debugRenderer.render(viewModel.world, camera.combined);
         }
         game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);

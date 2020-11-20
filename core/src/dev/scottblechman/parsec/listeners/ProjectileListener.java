@@ -17,9 +17,16 @@ public class ProjectileListener implements ContactListener {
 
     @Override
     public void beginContact(Contact contact) {
+        // Handle barrier collisions separately
+        if(contact.getFixtureA().getUserData() == EntityType.BARRIER && contact.getFixtureB().getUserData() == EntityType.PROJECTILE) {
+            viewModel.reset(true);
+            return;
+        }
+
         switch((EntityType) contact.getFixtureB().getUserData()) {
             case SUN:
             case MOON:
+            case BARRIER:
                 viewModel.reset(true);
                 break;
             case TARGET_MOON:

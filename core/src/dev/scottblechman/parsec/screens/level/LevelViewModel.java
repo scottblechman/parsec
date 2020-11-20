@@ -8,6 +8,7 @@ import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.data.LevelService;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
+import dev.scottblechman.parsec.models.Barrier;
 import dev.scottblechman.parsec.models.Moon;
 import dev.scottblechman.parsec.models.Projectile;
 import dev.scottblechman.parsec.models.enums.EntityType;
@@ -23,6 +24,7 @@ public class LevelViewModel {
     Projectile projectile;
     Star star;
     ArrayList<Moon> moons;
+    Barrier barrier;
     ProjectileListener contactListener;
     LevelService levelService;
     Parsec game;
@@ -52,6 +54,12 @@ public class LevelViewModel {
         for(int i = 0; i < levelService.getMoonRadii().length; i++) {
             moons.add(new Moon(world, levelService.getMoonRadius(i), false));
         }
+        barrier = new Barrier.Builder(world)
+                .position(Constants.Entities.BARRIER_INIT_POS)
+                .width(Constants.Entities.BARRIER_WIDTH)
+                .height(Constants.Entities.BARRIER_HEIGHT)
+                .build();
+
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
         this.game = game;
@@ -80,6 +88,10 @@ public class LevelViewModel {
 
     public List<Moon> getMoons() {
         return moons;
+    }
+
+    public Barrier getBarrier() {
+        return barrier;
     }
 
     public void dispose() {
