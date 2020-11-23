@@ -213,8 +213,8 @@ public class LevelViewModel {
         if(levelService.lastLevel()) {
             game.navigateTo(ScreenState.SCORE);
         } else {
-            reset(false);
             resetMoons = true;
+            reset(false);
             levelService.nextLevel();
         }
     }

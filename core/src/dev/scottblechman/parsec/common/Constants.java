@@ -46,6 +46,6 @@ public class Constants {
         private Game() { }
 
         public static final float PROJECTILE_TIMEOUT = 30f;
-        public static final boolean DEBUG_MODE = false;
+        public static final boolean DEBUG_MODE = true;
     }
 }
