@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.data.LevelService;
+import dev.scottblechman.parsec.data.PrefsService;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
 import dev.scottblechman.parsec.models.Barrier;
 import dev.scottblechman.parsec.models.Moon;
@@ -26,6 +27,7 @@ public class LevelViewModel {
     ArrayList<Moon> moons;
     Barrier barrier;
     ProjectileListener contactListener;
+    PrefsService prefsService;
     LevelService levelService;
     Parsec game;
 
@@ -43,9 +45,13 @@ public class LevelViewModel {
     // Body reset flags
     private boolean resetProjectile = false;
     private boolean resetMoons = false;
+    private boolean resetBarrier = false;
 
     public LevelViewModel(Parsec game) {
-        levelService = new LevelService();
+        prefsService = new PrefsService();
+        boolean tutorial = prefsService.showTutorial();
+        levelService = new LevelService(tutorial);
+
         world = new World(new Vector2(0, 0), true);
         projectile = new Projectile(world);
         star = new Star(world);
@@ -54,11 +60,13 @@ public class LevelViewModel {
         for(int i = 0; i < levelService.getMoonRadii().length; i++) {
             moons.add(new Moon(world, levelService.getMoonRadius(i), false));
         }
-        barrier = new Barrier.Builder(world)
-                .position(Constants.Entities.BARRIER_INIT_POS)
-                .width(Constants.Entities.BARRIER_WIDTH)
-                .height(Constants.Entities.BARRIER_HEIGHT)
-                .build();
+        if(levelService.createBarrier()) {
+            barrier = new Barrier.Builder(world)
+                    .position(Constants.Entities.BARRIER_INIT_POS)
+                    .width(Constants.Entities.BARRIER_WIDTH)
+                    .height(Constants.Entities.BARRIER_HEIGHT)
+                    .build();
+        }
 
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
@@ -92,6 +100,18 @@ public class LevelViewModel {
 
     public Barrier getBarrier() {
         return barrier;
+    }
+
+    public boolean tutorialMode() {
+        return prefsService.showTutorial();
+    }
+
+    public String getLevelMessage() {
+        return levelService.getMessage();
+    }
+
+    public boolean shouldAlwaysAdvance() {
+        return levelService.shouldAlwaysAdvance();
     }
 
     public void dispose() {
@@ -152,6 +172,15 @@ public class LevelViewModel {
             }
             resetMoons = false;
         }
+
+        if(resetBarrier && levelService.createBarrier()) {
+            barrier = new Barrier.Builder(world)
+                    .position(Constants.Entities.BARRIER_INIT_POS)
+                    .width(Constants.Entities.BARRIER_WIDTH)
+                    .height(Constants.Entities.BARRIER_HEIGHT)
+                    .build();
+            resetBarrier = false;
+        }
     }
 
     /**
@@ -196,7 +225,7 @@ public class LevelViewModel {
         for (Body b : bodies) {
             EntityType type = (EntityType) b.getUserData();
 
-            if (type == EntityType.PROJECTILE || (resetMoons && (type == EntityType.MOON || type == EntityType.TARGET_MOON))) {
+            if (type == EntityType.PROJECTILE || (resetMoons && (type == EntityType.MOON || type == EntityType.TARGET_MOON || type == EntityType.BARRIER))) {
                 bodiesToDestroy.add(b);
             }
         }
@@ -214,6 +243,7 @@ public class LevelViewModel {
             game.navigateTo(ScreenState.SCORE);
         } else {
             resetMoons = true;
+            resetBarrier = true;
             reset(false);
             levelService.nextLevel();
         }

@@ -17,6 +17,12 @@ public class ProjectileListener implements ContactListener {
 
     @Override
     public void beginContact(Contact contact) {
+        // If we should always advance, any projectile collision counts
+        if(viewModel.shouldAlwaysAdvance() && (contact.getFixtureA().getUserData() == EntityType.PROJECTILE || contact.getFixtureB().getUserData() == EntityType.PROJECTILE)) {
+            viewModel.nextLevel();
+            return;
+        }
+
         // Handle barrier collisions separately
         if(contact.getFixtureA().getUserData() == EntityType.BARRIER && contact.getFixtureB().getUserData() == EntityType.PROJECTILE) {
             viewModel.reset(true);
@@ -30,7 +36,9 @@ public class ProjectileListener implements ContactListener {
                 viewModel.reset(true);
                 break;
             case TARGET_MOON:
-                viewModel.nextLevel();
+                if(contact.getFixtureA().getUserData() == EntityType.PROJECTILE) {
+                    viewModel.nextLevel();
+                }
                 break;
             case PROJECTILE:
             case UNDEFINED:

@@ -67,9 +67,6 @@ public class LevelScreen implements Screen, InputProcessor {
         // Draw projectile
         game.getShapeRenderer().circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
                 Constants.Entities.PROJECTILE_RADIUS);
-        // Draw sun
-        game.getShapeRenderer().circle(viewModel.getSunPosition().x, viewModel.getSunPosition().y,
-                Constants.Entities.SUN_RADIUS);
         // Draw drag (if occurring)
         if(dragging) {
             game.getShapeRenderer().line(dragStart, dragEnd);
@@ -84,9 +81,16 @@ public class LevelScreen implements Screen, InputProcessor {
             }
         }
         // Draw barrier
-        game.getShapeRenderer().rect(viewModel.getBarrier().getPosition().x - (viewModel.getBarrier().getWidth() / 2),
-                viewModel.getBarrier().getPosition().y - (viewModel.getBarrier().getHeight() / 2),
-                viewModel.getBarrier().getWidth(), viewModel.getBarrier().getHeight());
+        if(viewModel.getBarrier() != null) {
+            game.getShapeRenderer().rect(viewModel.getBarrier().getPosition().x - (viewModel.getBarrier().getWidth() / 2),
+                    viewModel.getBarrier().getPosition().y - (viewModel.getBarrier().getHeight() / 2),
+                    viewModel.getBarrier().getWidth(), viewModel.getBarrier().getHeight());
+        }
+
+        // Draw sun
+        game.getShapeRenderer().circle(viewModel.getSunPosition().x, viewModel.getSunPosition().y,
+                Constants.Entities.SUN_RADIUS);
+
         game.getShapeRenderer().end();
 
         // Debug rendering
@@ -103,8 +107,12 @@ public class LevelScreen implements Screen, InputProcessor {
         game.getShapeRenderer().end();
 
         game.getSpriteBatch().begin();
-        textUtils.writeGrid("SHOTS:  " + viewModel.getShots(), 4, 1, 3);
-        textUtils.writeGrid("SYSTEM  " + viewModel.getLevelNumber(), 4, 2, 3);
+        if(viewModel.tutorialMode()) {
+            textUtils.writeGrid(viewModel.getLevelMessage(), 3, 1, 2);
+        } else {
+            textUtils.writeGrid("SHOTS:  " + viewModel.getShots(), 4, 1, 3);
+            textUtils.writeGrid("SYSTEM  " + viewModel.getLevelNumber(), 4, 2, 3);
+        }
         game.getSpriteBatch().end();
 
         viewModel.stepWorld();
