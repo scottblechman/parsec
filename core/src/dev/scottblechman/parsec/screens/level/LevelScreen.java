@@ -146,7 +146,10 @@ public class LevelScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        return false;
+        if(keycode == Input.Keys.ESCAPE && viewModel.isInMotion()) {
+            viewModel.reset(true);
+        }
+        return true;
     }
 
     @Override
