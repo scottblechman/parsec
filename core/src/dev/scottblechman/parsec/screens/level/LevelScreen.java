@@ -65,22 +65,12 @@ public class LevelScreen implements Screen, InputProcessor {
         game.getShapeRenderer().setProjectionMatrix(camera.combined);
 
         game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
+        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.SATELLITE));
+
         // Draw projectile
         game.getShapeRenderer().circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
                 Constants.Entities.PROJECTILE_RADIUS);
-        // Draw drag (if occurring)
-        if(dragging) {
-            game.getShapeRenderer().line(dragStart, dragEnd);
-        }
-        for(Moon moon : viewModel.getMoons()) {
-            if(moon.getType() == EntityType.TARGET_MOON) {
-                game.getShapeRenderer().setColor(Color.GOLDENROD);
-            }
-            game.getShapeRenderer().circle(moon.getPosition().x, moon.getPosition().y, Constants.Entities.MOON_RADIUS);
-            if(moon.getType() == EntityType.TARGET_MOON) {
-                game.getShapeRenderer().setColor(Color.WHITE);
-            }
-        }
+
         // Draw barrier
         if(viewModel.getBarrier() != null) {
             game.getShapeRenderer().rect(viewModel.getBarrier().getPosition().x - (viewModel.getBarrier().getWidth() / 2),
@@ -88,9 +78,27 @@ public class LevelScreen implements Screen, InputProcessor {
                     viewModel.getBarrier().getWidth(), viewModel.getBarrier().getHeight());
         }
 
+        // Draw drag (if occurring)
+        if(dragging) {
+            game.getShapeRenderer().line(dragStart, dragEnd);
+        }
+        for(Moon moon : viewModel.getMoons()) {
+            if(moon.getType() == EntityType.TARGET_MOON) {
+                game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.TARGET));
+            } else {
+                game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.MOON));
+            }
+            game.getShapeRenderer().circle(moon.getPosition().x, moon.getPosition().y, Constants.Entities.MOON_RADIUS);
+            if(moon.getType() == EntityType.TARGET_MOON) {
+                game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
+            }
+        }
+
         // Draw sun
+        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.SUN));
         game.getShapeRenderer().circle(viewModel.getSunPosition().x, viewModel.getSunPosition().y,
                 Constants.Entities.SUN_RADIUS);
+        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
 
         game.getShapeRenderer().end();
 

@@ -50,6 +50,7 @@ public class ScoreScreen implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
+        game.getSpriteBatch().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
         game.getSpriteBatch().begin();
         textUtils.writeGrid("GAME OVER", 5, 2, 4);
         textUtils.writeGrid("TOTAL SCORE: " + game.getScoreService().getTotal(), 11, 5, 1);

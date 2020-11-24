@@ -54,5 +54,10 @@ public class Constants {
         private Colors() { }
 
         public static final String BACKGROUND_PRIMARY = "#16161D";
+        public static final String FOREGROUND_PRIMARY = "#E5EBEA";
+        public static final String SUN = "#FFEDC2";
+        public static final String SATELLITE = "#69747C";
+        public static final String MOON = "#856A5D";
+        public static final String TARGET = "#BDC2C7";
     }
 }

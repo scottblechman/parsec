@@ -50,6 +50,7 @@ public class MenuScreen implements Screen, InputProcessor {
 
         camera.update();
 
+        game.getSpriteBatch().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
         game.getSpriteBatch().begin();
         game.getFont().getData().setScale(3f);
         textUtils.writeGrid("(PAR) SEC", 5, 2, 3);
