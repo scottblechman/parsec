@@ -64,6 +64,14 @@ public class LevelScreen implements Screen, InputProcessor {
         game.getSpriteBatch().setProjectionMatrix(camera.combined);
         game.getShapeRenderer().setProjectionMatrix(camera.combined);
 
+        game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
+        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
+        // Draw star field
+        for(Vector3 star : viewModel.getStarField()) {
+            game.getShapeRenderer().point(star.x, star.y, 0);
+        }
+        game.getShapeRenderer().end();
+
         game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
         game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.SATELLITE));
 

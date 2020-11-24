@@ -27,8 +27,11 @@ public class MenuScreen implements Screen, InputProcessor {
 
     Vector3 tp = new Vector3();
 
+    private final MenuViewModel viewModel;
+
     public MenuScreen(Parsec game) {
         this.game = game;
+        this.viewModel = new MenuViewModel();
         this.camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.Camera.VIEWPORT_WIDTH, Constants.Camera.VIEWPORT_HEIGHT);
         newGameButton = new Button("NEW GAME", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 2f, Constants.Camera.VIEWPORT_HEIGHT / 2f), game.getFont());
@@ -59,12 +62,20 @@ public class MenuScreen implements Screen, InputProcessor {
         quitButton.draw(game.getSpriteBatch());
         game.getSpriteBatch().end();
 
+        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
+        game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
+        // Draw star field
+        for(Vector3 star : viewModel.getStarField()) {
+            game.getShapeRenderer().point(star.x, star.y, 0);
+        }
+
         if(Constants.Game.DEBUG_MODE) {
-            game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
             game.getShapeRenderer().rect(newGameButton.getBounds().x, newGameButton.getBounds().y, newGameButton.getBounds().width, newGameButton.getBounds().height);
             game.getShapeRenderer().rect(quitButton.getBounds().x, quitButton.getBounds().y, quitButton.getBounds().width, quitButton.getBounds().height);
-            game.getShapeRenderer().end();
         }
+        game.getShapeRenderer().end();
+
+        viewModel.update();
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import dev.scottblechman.parsec.Parsec;
@@ -18,6 +19,7 @@ public class ScoreScreen implements Screen, InputProcessor {
 
     private final Parsec game;
     private final OrthographicCamera camera;
+    private final ScoreViewModel viewModel;
 
     private TextUtils textUtils;
 
@@ -28,6 +30,7 @@ public class ScoreScreen implements Screen, InputProcessor {
 
     public ScoreScreen(Parsec game) {
         this.game = game;
+        this.viewModel = new ScoreViewModel();
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.Camera.VIEWPORT_WIDTH, Constants.Camera.VIEWPORT_HEIGHT);
@@ -50,6 +53,19 @@ public class ScoreScreen implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
+        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
+        game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
+        // Draw star field
+        for(Vector3 star : viewModel.getStarField()) {
+            game.getShapeRenderer().point(star.x, star.y, 0);
+        }
+
+        if(Constants.Game.DEBUG_MODE) {
+            game.getShapeRenderer().rect(newGameButton.getBounds().x, newGameButton.getBounds().y, newGameButton.getBounds().width, newGameButton.getBounds().height);
+            game.getShapeRenderer().rect(quitButton.getBounds().x, quitButton.getBounds().y, quitButton.getBounds().width, quitButton.getBounds().height);
+        }
+        game.getShapeRenderer().end();
+
         game.getSpriteBatch().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
         game.getSpriteBatch().begin();
         textUtils.writeGrid("GAME OVER", 5, 2, 4);
@@ -58,6 +74,8 @@ public class ScoreScreen implements Screen, InputProcessor {
         newGameButton.draw(game.getSpriteBatch());
         quitButton.draw(game.getSpriteBatch());
         game.getSpriteBatch().end();
+
+        viewModel.update();
     }
 
     @Override

@@ -60,4 +60,21 @@ public class Constants {
         public static final String MOON = "#856A5D";
         public static final String TARGET = "#BDC2C7";
     }
+
+    public static class Graphics {
+
+        private Graphics() { }
+
+        // The number of stars on screen at a time
+        public static final int STAR_FIELD_SIZE = 100;
+
+        // Minimum pixels a star can travel before disappearing
+        public static final int STAR_BURNOUT_MIN = 100;
+
+        // Maximum pixels a star can travel before disappearing
+        public static final int STAR_BURNOUT_MAX = 200;
+
+        // The chance, from 0% to 100%, of a new star being created when there is a gap
+        public static final int STAR_SPAWN_CHANCE = 50;
+    }
 }

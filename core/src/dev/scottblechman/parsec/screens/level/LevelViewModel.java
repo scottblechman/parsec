@@ -2,10 +2,12 @@ package dev.scottblechman.parsec.screens.level;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.common.components.StarField;
 import dev.scottblechman.parsec.data.LevelService;
 import dev.scottblechman.parsec.data.PrefsService;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
@@ -30,6 +32,7 @@ public class LevelViewModel {
     PrefsService prefsService;
     LevelService levelService;
     Parsec game;
+    StarField starField;
 
     static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
@@ -71,6 +74,7 @@ public class LevelViewModel {
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
         this.game = game;
+        starField = new StarField();
     }
 
     public Vector2 getProjectilePosition() {
@@ -117,6 +121,10 @@ public class LevelViewModel {
         return levelService.onTutorialLevel();
     }
 
+    public List<Vector3> getStarField() {
+        return starField.getPool();
+    }
+
     public void dispose() {
         world.dispose();
     }
@@ -147,6 +155,9 @@ public class LevelViewModel {
 
             accumulator -= STEP_TIME;
         }
+
+        // Update non-physics graphics
+        starField.update();
     }
 
     /**
