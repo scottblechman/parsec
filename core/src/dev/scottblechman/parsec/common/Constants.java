@@ -48,4 +48,11 @@ public class Constants {
         public static final float PROJECTILE_TIMEOUT = 30f;
         public static final boolean DEBUG_MODE = false;
     }
+
+    public static class Colors {
+
+        private Colors() { }
+
+        public static final String BACKGROUND_PRIMARY = "#16161D";
+    }
 }
