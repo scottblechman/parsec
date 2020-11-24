@@ -5,5 +5,6 @@ public enum EntityType {
     PROJECTILE,
     SUN,
     MOON,
-    TARGET_MOON
+    TARGET_MOON,
+    BARRIER
 }

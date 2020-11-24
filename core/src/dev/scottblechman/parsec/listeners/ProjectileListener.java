@@ -1,9 +1,6 @@
 package dev.scottblechman.parsec.listeners;
 
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.*;
 import dev.scottblechman.parsec.models.enums.EntityType;
 import dev.scottblechman.parsec.screens.level.LevelViewModel;
 
@@ -17,9 +14,29 @@ public class ProjectileListener implements ContactListener {
 
     @Override
     public void beginContact(Contact contact) {
-        switch((EntityType) contact.getFixtureB().getUserData()) {
+        // We abstract the "colliding" and "target" entities in the contact to account for either one being
+        // fixture A or B in the object.
+        Fixture target;
+
+        // We can skip any collisions that don't involve the projectile (i.e. moon and sun in tutorial levels)
+        if(contact.getFixtureA().getUserData() == EntityType.PROJECTILE) {
+            target = contact.getFixtureB();
+        } else if(contact.getFixtureB().getUserData() == EntityType.PROJECTILE) {
+            target = contact.getFixtureA();
+        } else {
+            return;
+        }
+
+        // If we should always advance, any projectile collision counts
+        if(viewModel.shouldAlwaysAdvance()) {
+            viewModel.nextLevel();
+            return;
+        }
+
+        switch((EntityType) target.getUserData()) {
             case SUN:
             case MOON:
+            case BARRIER:
                 viewModel.reset(true);
                 break;
             case TARGET_MOON:

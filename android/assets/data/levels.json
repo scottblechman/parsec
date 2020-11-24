@@ -1,9 +1,16 @@
 [
   {
-    "targetRadius": 100
+    "targetRadius": 100,
+    "barrier": true
   },
   {
     "targetRadius": 80,
-    "moons": [120]
+    "moons": [120],
+    "barrier": true
+  },
+  {
+    "targetRadius": 85,
+    "moons": [100, 110],
+    "barrier": true
   }
 ]

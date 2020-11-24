@@ -26,6 +26,10 @@ public class TextUtils {
      * @param offsetVertical the vertical quadrant to write in, from bottom to top
      */
     public void writeGrid(String text, int squares, int offsetHorizontal, int offsetVertical) {
+        if(text == null || text.isEmpty()) {
+            return;
+        }
+
         if((offsetHorizontal < 0 || offsetHorizontal > squares - 1) || (offsetVertical < 0 || offsetVertical > squares - 1)) {
             Gdx.app.log(TextUtils.class.toString(), "Text at (" + offsetHorizontal + ", " + offsetVertical +
                     ") is out of bounds horizontally. The text was not written.");

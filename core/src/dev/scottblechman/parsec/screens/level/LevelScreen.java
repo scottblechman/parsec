@@ -33,7 +33,6 @@ public class LevelScreen implements Screen, InputProcessor {
     TextUtils textUtils;
 
     // Debug flags
-    boolean showWorld = false;
     boolean show4x4 = false;
     boolean show3x3 = false;
 
@@ -68,9 +67,6 @@ public class LevelScreen implements Screen, InputProcessor {
         // Draw projectile
         game.getShapeRenderer().circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
                 Constants.Entities.PROJECTILE_RADIUS);
-        // Draw sun
-        game.getShapeRenderer().circle(viewModel.getSunPosition().x, viewModel.getSunPosition().y,
-                Constants.Entities.SUN_RADIUS);
         // Draw drag (if occurring)
         if(dragging) {
             game.getShapeRenderer().line(dragStart, dragEnd);
@@ -84,10 +80,21 @@ public class LevelScreen implements Screen, InputProcessor {
                 game.getShapeRenderer().setColor(Color.WHITE);
             }
         }
+        // Draw barrier
+        if(viewModel.getBarrier() != null) {
+            game.getShapeRenderer().rect(viewModel.getBarrier().getPosition().x - (viewModel.getBarrier().getWidth() / 2),
+                    viewModel.getBarrier().getPosition().y - (viewModel.getBarrier().getHeight() / 2),
+                    viewModel.getBarrier().getWidth(), viewModel.getBarrier().getHeight());
+        }
+
+        // Draw sun
+        game.getShapeRenderer().circle(viewModel.getSunPosition().x, viewModel.getSunPosition().y,
+                Constants.Entities.SUN_RADIUS);
+
         game.getShapeRenderer().end();
 
         // Debug rendering
-        if(showWorld) {
+        if(Constants.Game.DEBUG_MODE) {
             debugRenderer.render(viewModel.world, camera.combined);
         }
         game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
@@ -100,8 +107,12 @@ public class LevelScreen implements Screen, InputProcessor {
         game.getShapeRenderer().end();
 
         game.getSpriteBatch().begin();
-        textUtils.writeGrid("SHOTS:  " + viewModel.getShots(), 4, 1, 3);
-        textUtils.writeGrid("SYSTEM  " + viewModel.getLevelNumber(), 4, 2, 3);
+        if(viewModel.tutorialMode() && !viewModel.onTutorialLevel()) {
+            textUtils.writeGrid(viewModel.getLevelMessage(), 3, 1, 2);
+        } else {
+            textUtils.writeGrid("SHOTS:  " + viewModel.getShots(), 4, 1, 3);
+            textUtils.writeGrid("SYSTEM  " + viewModel.getLevelNumber(), 4, 2, 3);
+        }
         game.getSpriteBatch().end();
 
         viewModel.stepWorld();
@@ -135,7 +146,10 @@ public class LevelScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        return false;
+        if(keycode == Input.Keys.ESCAPE && viewModel.isInMotion()) {
+            viewModel.reset(true);
+        }
+        return true;
     }
 
     @Override
