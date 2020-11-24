@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class LevelService {
 
     private int currentLevel = 0;
+    private int numTutorialLevels = 0;
     private ArrayList<Level> levels;
 
     public LevelService(boolean tutorial) {
@@ -20,6 +21,7 @@ public class LevelService {
         if(tutorial) {
             //noinspection unchecked
             ArrayList<Level> tutorialLevels = json.fromJson(ArrayList.class, Level.class, Gdx.files.internal("data/tutorial.json"));
+            numTutorialLevels = tutorialLevels.size();
             tutorialLevels.addAll(this.levels);
             this.levels = tutorialLevels;
         }
@@ -54,6 +56,14 @@ public class LevelService {
 
     public boolean shouldAlwaysAdvance() {
         return levels.get(currentLevel).shouldAlwaysAdvance();
+    }
+
+    /**
+     * Checks if the current level is a tutorial level.
+     * @return true when the current level is higher than the number of tutorial levels
+     */
+    public boolean onTutorialLevel() {
+        return currentLevel >= numTutorialLevels;
     }
 
     public boolean lastLevel() {

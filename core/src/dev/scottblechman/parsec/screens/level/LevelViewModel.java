@@ -60,7 +60,7 @@ public class LevelViewModel {
         for(int i = 0; i < levelService.getMoonRadii().length; i++) {
             moons.add(new Moon(world, levelService.getMoonRadius(i), false));
         }
-        if(levelService.createBarrier()) {
+        if(levelService.createBarrier() && !Constants.Game.DEBUG_MODE) {
             barrier = new Barrier.Builder(world)
                     .position(Constants.Entities.BARRIER_INIT_POS)
                     .width(Constants.Entities.BARRIER_WIDTH)
@@ -81,7 +81,6 @@ public class LevelViewModel {
         return star.getPosition();
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isInMotion() {
         return projectileInMotion;
     }
@@ -112,6 +111,10 @@ public class LevelViewModel {
 
     public boolean shouldAlwaysAdvance() {
         return levelService.shouldAlwaysAdvance();
+    }
+
+    public boolean onTutorialLevel() {
+        return levelService.onTutorialLevel();
     }
 
     public void dispose() {
@@ -173,7 +176,7 @@ public class LevelViewModel {
             resetMoons = false;
         }
 
-        if(resetBarrier && levelService.createBarrier()) {
+        if(resetBarrier && levelService.createBarrier() && !Constants.Game.DEBUG_MODE) {
             barrier = new Barrier.Builder(world)
                     .position(Constants.Entities.BARRIER_INIT_POS)
                     .width(Constants.Entities.BARRIER_WIDTH)
