@@ -20,7 +20,7 @@ public class TextUtils {
     }
 
     /**
-     * Draws text to the screen, assuming a 4x4 grid. Draws to the center of the quadrant by default.
+     * Draws text to the screen, assuming a grid. Draws to the center of the quadrant by default.
      * @param text String to be written
      * @param offsetHorizontal the horizontal quadrant to write in, from left to right
      * @param offsetVertical the vertical quadrant to write in, from bottom to top
@@ -41,7 +41,7 @@ public class TextUtils {
         // Y needs to offset by height to start at quadrant's (0, 0)
         top += layout.height;
         font.draw(batch, text, left + (Constants.Camera.VIEWPORT_WIDTH / (float) (squares * 2)) - (layout.width / 2),
-                top + (Constants.Camera.VIEWPORT_HEIGHT / (float) (squares * 2)));
+                top + (Constants.Camera.VIEWPORT_HEIGHT / (float) (squares * 2)), layout.width, Align.center, false);
     }
 
     /**
