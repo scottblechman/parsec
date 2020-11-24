@@ -66,6 +66,14 @@ public class LevelService {
         return currentLevel >= numTutorialLevels;
     }
 
+    /**
+     * Gets the number of tutorial levels for adjusting score indices.
+     * @return number of tutorial levels
+     */
+    public int tutorialLevels() {
+        return numTutorialLevels;
+    }
+
     public boolean lastLevel() {
         return currentLevel == levels.size() - 1;
     }
