@@ -76,5 +76,8 @@ public class Constants {
 
         // The chance, from 0% to 100%, of a new star being created when there is a gap
         public static final int STAR_SPAWN_CHANCE = 50;
+
+        // How fast to write new characters from the tutorial message
+        public static final int TYPEWRITER_SPEED = 12;
     }
 }

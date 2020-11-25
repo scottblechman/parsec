@@ -50,6 +50,9 @@ public class LevelViewModel {
     private boolean resetMoons = false;
     private boolean resetBarrier = false;
 
+    // Tracks how much message to show for typewriter effect
+    private float levelMessageTimer = 0f;
+
     public LevelViewModel(Parsec game) {
         prefsService = new PrefsService();
         boolean tutorial = prefsService.showTutorial();
@@ -110,7 +113,11 @@ public class LevelViewModel {
     }
 
     public String getLevelMessage() {
-        return levelService.getMessage();
+        if(levelMessageTimer >= levelService.getMessage().length()) {
+            levelMessageTimer = levelService.getMessage().length();
+            return levelService.getMessage();
+        }
+        return levelService.getMessage().substring(0, Math.round(levelMessageTimer));
     }
 
     public boolean shouldAlwaysAdvance() {
@@ -134,6 +141,10 @@ public class LevelViewModel {
 
         accumulator += Math.min(delta, 0.25f);
 
+        // Update non-physics graphics
+        starField.update();
+        levelMessageTimer += (accumulator * Constants.Graphics.TYPEWRITER_SPEED);
+
         while (accumulator >= STEP_TIME) {
             // Apply forces before stepping world
             if (projectileInMotion) {
@@ -155,9 +166,6 @@ public class LevelViewModel {
 
             accumulator -= STEP_TIME;
         }
-
-        // Update non-physics graphics
-        starField.update();
     }
 
     /**
@@ -260,6 +268,7 @@ public class LevelViewModel {
         } else {
             resetMoons = true;
             resetBarrier = true;
+            levelMessageTimer = 0f;
             reset(false);
             levelService.nextLevel();
         }
