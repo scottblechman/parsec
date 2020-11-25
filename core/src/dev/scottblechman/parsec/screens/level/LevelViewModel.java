@@ -132,6 +132,10 @@ public class LevelViewModel {
         return starField.getPool();
     }
 
+    public float getTimeout() {
+        return (float) Math.ceil(timeout);
+    }
+
     public void dispose() {
         world.dispose();
     }

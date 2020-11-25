@@ -73,7 +73,7 @@ public class LevelScreen implements Screen, InputProcessor {
         game.getShapeRenderer().end();
 
         game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
-        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.SATELLITE));
+        game.getShapeRenderer().setColor(getSatColor());
 
         // Draw projectile
         game.getShapeRenderer().circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
@@ -240,5 +240,24 @@ public class LevelScreen implements Screen, InputProcessor {
                 game.getShapeRenderer().rect(start.x, start.y, end.x,  end.y);
             }
         }
+    }
+
+    /**
+     * Uses the timeout to add a hue and lightness adjustment to the satellite, mimicking heating.
+     * @return color with hue and lightness adjusted for timeout state
+     */
+    private Color getSatColor() {
+        // Mod satellite lightness based on timer
+        Color satelliteColor = Color.valueOf(Constants.Colors.SATELLITE);
+        float[] hsv = new float[3];
+        satelliteColor.toHsv(hsv);
+        if(hsv[0] > 0) {
+            hsv[0] -= viewModel.getTimeout() * Constants.Graphics.SATELLITE_HUE_SCALAR;
+        } else {
+            hsv[0] = 0;
+        }
+        hsv[2] += (viewModel.getTimeout()) / 100;
+
+        return satelliteColor.fromHsv(hsv);
     }
 }

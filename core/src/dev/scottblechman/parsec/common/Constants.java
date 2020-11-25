@@ -79,5 +79,8 @@ public class Constants {
 
         // How fast to write new characters from the tutorial message
         public static final int TYPEWRITER_SPEED = 12;
+
+        // Ensures reddening of satellite model is visible before timeout elapses
+        public static final int SATELLITE_HUE_SCALAR = (int) (Game.PROJECTILE_TIMEOUT / 3f);
     }
 }
