@@ -77,7 +77,10 @@ public class LevelScreen implements Screen, InputProcessor {
 
         // Draw projectile
         game.getShapeRenderer().circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
-                Constants.Entities.PROJECTILE_RADIUS);
+                Constants.Entities.PROJECTILE_RADIUS / 1.5f);
+        game.getShapeRenderer().rect(viewModel.getProjectilePosition().x - Constants.Entities.PROJECTILE_RADIUS * 1.5f,
+                viewModel.getProjectilePosition().y - Constants.Entities.PROJECTILE_RADIUS / 3f,
+                Constants.Entities.PROJECTILE_RADIUS * 3f, Constants.Entities.PROJECTILE_RADIUS / 1.5f);
 
         // Draw barrier
         if(viewModel.getBarrier() != null) {
