@@ -53,6 +53,9 @@ public class LevelViewModel {
     // Tracks how much message to show for typewriter effect
     private float levelMessageTimer = 0f;
 
+    // Indicates whether to show an option to advance to the next level
+    private boolean levelFinished = false;
+
     public LevelViewModel(Parsec game) {
         prefsService = new PrefsService();
         boolean tutorial = prefsService.showTutorial();
@@ -130,6 +133,10 @@ public class LevelViewModel {
 
     public List<Vector3> getStarField() {
         return starField.getPool();
+    }
+
+    public boolean isLevelFinished() {
+        return levelFinished;
     }
 
     public float getTimeout() {
@@ -264,6 +271,7 @@ public class LevelViewModel {
      * Advances the level after the target moon has been hit.
      */
     public void nextLevel() {
+        levelFinished = false;
         if(!levelService.onTutorialLevel()) {
             game.getScoreService().writeScore(levelService.getLevelNumber(), shotsAttempted + 1);
         }
@@ -276,5 +284,12 @@ public class LevelViewModel {
             reset(false);
             levelService.nextLevel();
         }
+    }
+
+    /**
+     * Creates a break between level completion and next level start by showing a button to advance.
+     */
+    public void finishLevel() {
+        levelFinished = true;
     }
 }

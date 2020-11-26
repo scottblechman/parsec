@@ -29,7 +29,7 @@ public class ProjectileListener implements ContactListener {
 
         // If we should always advance, any projectile collision counts
         if(viewModel.shouldAlwaysAdvance()) {
-            viewModel.nextLevel();
+            viewModel.finishLevel();
             return;
         }
 
@@ -37,10 +37,12 @@ public class ProjectileListener implements ContactListener {
             case SUN:
             case MOON:
             case BARRIER:
-                viewModel.reset(true);
+                if(!viewModel.isLevelFinished()) {
+                    viewModel.reset(true);
+                }
                 break;
             case TARGET_MOON:
-                viewModel.nextLevel();
+                viewModel.finishLevel();
                 break;
             case PROJECTILE:
             case UNDEFINED:

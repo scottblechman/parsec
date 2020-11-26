@@ -71,9 +71,10 @@ public class ScoreScreen implements Screen, InputProcessor {
         textUtils.writeGrid("GAME OVER", 5, 2, 4);
         textUtils.writeGrid("TOTAL SCORE: " + game.getScoreService().getTotal(), 11, 5, 1);
         textUtils.writeList(makeScoreList());
-        newGameButton.draw(game.getSpriteBatch());
-        quitButton.draw(game.getSpriteBatch());
         game.getSpriteBatch().end();
+
+        newGameButton.draw(game.getSpriteBatch(), game.getShapeRenderer());
+        quitButton.draw(game.getSpriteBatch(), game.getShapeRenderer());
 
         viewModel.update();
     }

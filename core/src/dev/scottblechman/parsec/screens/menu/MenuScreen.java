@@ -58,8 +58,6 @@ public class MenuScreen implements Screen, InputProcessor {
         game.getFont().getData().setScale(3f);
         textUtils.writeGrid("(PAR) SEC", 5, 2, 3);
         game.getFont().getData().setScale(1f);
-        newGameButton.draw(game.getSpriteBatch());
-        quitButton.draw(game.getSpriteBatch());
         game.getSpriteBatch().end();
 
         game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
@@ -74,6 +72,9 @@ public class MenuScreen implements Screen, InputProcessor {
             game.getShapeRenderer().rect(quitButton.getBounds().x, quitButton.getBounds().y, quitButton.getBounds().width, quitButton.getBounds().height);
         }
         game.getShapeRenderer().end();
+
+        newGameButton.draw(game.getSpriteBatch(), game.getShapeRenderer());
+        quitButton.draw(game.getSpriteBatch(), game.getShapeRenderer());
 
         viewModel.update();
     }

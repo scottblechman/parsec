@@ -82,5 +82,7 @@ public class Constants {
 
         // Ensures reddening of satellite model is visible before timeout elapses
         public static final int SATELLITE_HUE_SCALAR = (int) (Game.PROJECTILE_TIMEOUT / 3f);
+
+        public static final int BUTTON_PADDING = 4;
     }
 }
