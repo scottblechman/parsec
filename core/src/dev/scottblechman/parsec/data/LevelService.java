@@ -63,7 +63,7 @@ public class LevelService {
      * @return true when the current level is higher than the number of tutorial levels
      */
     public boolean onTutorialLevel() {
-        return currentLevel >= numTutorialLevels;
+        return currentLevel < numTutorialLevels;
     }
 
     /**

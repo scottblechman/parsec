@@ -9,6 +9,7 @@ import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.common.components.Button;
 import dev.scottblechman.parsec.common.components.StarField;
+import dev.scottblechman.parsec.common.components.TypewriterText;
 import dev.scottblechman.parsec.data.LevelService;
 import dev.scottblechman.parsec.data.PrefsService;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
@@ -35,6 +36,8 @@ public class LevelViewModel {
     Parsec game;
     StarField starField;
     Button nextLevelButton;
+    TypewriterText levelMessage;
+    TypewriterText completeMessage;
 
     static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
@@ -51,9 +54,6 @@ public class LevelViewModel {
     private boolean resetProjectile = false;
     private boolean resetMoons = false;
     private boolean resetBarrier = false;
-
-    // Tracks how much message to show for typewriter effect
-    private float levelMessageTimer = 0f;
 
     // Indicates whether to show an option to advance to the next level
     private boolean levelFinished = false;
@@ -84,6 +84,8 @@ public class LevelViewModel {
         this.game = game;
         starField = new StarField();
         nextLevelButton = new Button("NEXT LEVEL", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 2f, Constants.Camera.VIEWPORT_HEIGHT / 3f), game.getFont());
+        levelMessage = new TypewriterText(levelService.getMessage(), true);
+        completeMessage = new TypewriterText("LEVEL COMPLETE!", false);
     }
 
     public Vector2 getProjectilePosition() {
@@ -119,11 +121,11 @@ public class LevelViewModel {
     }
 
     public String getLevelMessage() {
-        if(levelMessageTimer >= levelService.getMessage().length()) {
-            levelMessageTimer = levelService.getMessage().length();
-            return levelService.getMessage();
-        }
-        return levelService.getMessage().substring(0, Math.round(levelMessageTimer));
+        return levelMessage.getText().toUpperCase();
+    }
+
+    public String getCompleteMessage() {
+        return completeMessage.getText();
     }
 
     public boolean shouldAlwaysAdvance() {
@@ -161,8 +163,8 @@ public class LevelViewModel {
 
         // Update non-physics graphics
         starField.update();
-
-        levelMessageTimer += (accumulator * Constants.Graphics.TYPEWRITER_SPEED);
+        levelMessage.update();
+        completeMessage.update();
 
         while (accumulator >= STEP_TIME) {
             // Apply forces before stepping world
@@ -288,9 +290,12 @@ public class LevelViewModel {
         } else {
             resetMoons = true;
             resetBarrier = true;
-            levelMessageTimer = 0f;
             reset(false);
             levelService.nextLevel();
+            if(levelService.onTutorialLevel()) {
+                levelMessage = new TypewriterText(levelService.getMessage(), true);
+            }
+            completeMessage.reset();
         }
     }
 
@@ -299,5 +304,6 @@ public class LevelViewModel {
      */
     public void finishLevel() {
         levelFinished = true;
+        completeMessage.start();
     }
 }
