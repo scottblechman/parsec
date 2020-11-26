@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.common.components.Button;
 import dev.scottblechman.parsec.common.components.StarField;
 import dev.scottblechman.parsec.data.LevelService;
 import dev.scottblechman.parsec.data.PrefsService;
@@ -33,6 +34,7 @@ public class LevelViewModel {
     LevelService levelService;
     Parsec game;
     StarField starField;
+    Button nextLevelButton;
 
     static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
@@ -81,6 +83,7 @@ public class LevelViewModel {
         world.setContactListener(contactListener);
         this.game = game;
         starField = new StarField();
+        nextLevelButton = new Button("NEXT LEVEL", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 2f, Constants.Camera.VIEWPORT_HEIGHT / 3f), game.getFont());
     }
 
     public Vector2 getProjectilePosition() {
@@ -143,6 +146,10 @@ public class LevelViewModel {
         return (float) Math.ceil(timeout);
     }
 
+    public Button getNextLevelButton() {
+        return nextLevelButton;
+    }
+
     public void dispose() {
         world.dispose();
     }
@@ -154,6 +161,7 @@ public class LevelViewModel {
 
         // Update non-physics graphics
         starField.update();
+
         levelMessageTimer += (accumulator * Constants.Graphics.TYPEWRITER_SPEED);
 
         while (accumulator >= STEP_TIME) {

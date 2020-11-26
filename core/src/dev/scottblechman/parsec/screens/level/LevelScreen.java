@@ -13,7 +13,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
-import dev.scottblechman.parsec.common.components.Button;
 import dev.scottblechman.parsec.models.Moon;
 import dev.scottblechman.parsec.models.enums.EntityType;
 import dev.scottblechman.parsec.util.TextUtils;
@@ -37,8 +36,6 @@ public class LevelScreen implements Screen, InputProcessor {
     boolean show4x4 = false;
     boolean show3x3 = false;
 
-    private final Button nextLevelButton;
-
     public LevelScreen(Parsec game) {
         this.game = game;
 
@@ -46,8 +43,6 @@ public class LevelScreen implements Screen, InputProcessor {
         camera.setToOrtho(false, Constants.Camera.VIEWPORT_WIDTH, Constants.Camera.VIEWPORT_HEIGHT);
 
         viewModel = new LevelViewModel(game);
-
-        nextLevelButton = new Button("NEXT LEVEL", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 2f, Constants.Camera.VIEWPORT_HEIGHT / 3f), game.getFont());
 
         Gdx.input.setInputProcessor(this);
     }
@@ -132,7 +127,7 @@ public class LevelScreen implements Screen, InputProcessor {
         game.getSpriteBatch().end();
 
         if(viewModel.isLevelFinished()) {
-            nextLevelButton.draw(game.getSpriteBatch(), game.getShapeRenderer());
+            viewModel.getNextLevelButton().draw(game.getSpriteBatch(), game.getShapeRenderer());
         }
 
         viewModel.stepWorld();
@@ -193,7 +188,7 @@ public class LevelScreen implements Screen, InputProcessor {
             dragStart.y = camera.viewportHeight - screenY;
             dragEnd.y = camera.viewportHeight - screenY;
         }
-        if(nextLevelButton.getBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+        if(viewModel.getNextLevelButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
             viewModel.nextLevel();
         }
         return true;
@@ -225,7 +220,9 @@ public class LevelScreen implements Screen, InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        return false;
+        camera.unproject(tp.set(screenX, screenY, 0));
+        viewModel.getNextLevelButton().setHover(viewModel.getNextLevelButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY));
+        return true;
     }
 
     @Override

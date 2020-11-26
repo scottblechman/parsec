@@ -1,14 +1,17 @@
 package dev.scottblechman.parsec.common.components;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.common.components.interfaces.IComponent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class StarField {
+public class StarField implements IComponent {
     private final ArrayList<Vector3> starFieldPool;
     private final Random random;
 
@@ -31,6 +34,12 @@ public class StarField {
         starFieldPool.add(new Vector3(x, y, z));
     }
 
+    @Override
+    public void draw(SpriteBatch batch, ShapeRenderer renderer) {
+        // Intentionally left empty.
+    }
+
+    @Override
     public void update() {
         Iterator<Vector3> itr = starFieldPool.iterator();
         while (itr.hasNext()) {

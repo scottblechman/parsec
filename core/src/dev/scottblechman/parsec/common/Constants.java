@@ -45,7 +45,7 @@ public class Constants {
 
         private Game() { }
 
-        public static final float PROJECTILE_TIMEOUT = 30f;
+        public static final float PROJECTILE_TIMEOUT = 25f;
         public static final boolean DEBUG_MODE = false;
     }
 
@@ -84,5 +84,9 @@ public class Constants {
         public static final int SATELLITE_HUE_SCALAR = (int) (Game.PROJECTILE_TIMEOUT / 3f);
 
         public static final int BUTTON_PADDING = 4;
+
+        public static final int BUTTON_RADIUS = 3;
+
+        public static final int BUTTON_COOLDOWN_FRAMES = 20;
     }
 }

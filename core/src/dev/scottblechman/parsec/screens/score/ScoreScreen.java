@@ -7,11 +7,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
-import dev.scottblechman.parsec.common.components.Button;
 import dev.scottblechman.parsec.state.enums.ScreenState;
 import dev.scottblechman.parsec.util.TextUtils;
 
@@ -23,20 +21,14 @@ public class ScoreScreen implements Screen, InputProcessor {
 
     private TextUtils textUtils;
 
-    private final Button newGameButton;
-    private final Button quitButton;
-
     Vector3 tp = new Vector3();
 
     public ScoreScreen(Parsec game) {
         this.game = game;
-        this.viewModel = new ScoreViewModel();
+        this.viewModel = new ScoreViewModel(game);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.Camera.VIEWPORT_WIDTH, Constants.Camera.VIEWPORT_HEIGHT);
-
-        newGameButton = new Button("NEW GAME", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 3f, Constants.Camera.VIEWPORT_HEIGHT / 11f), game.getFont());
-        quitButton = new Button("QUIT", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 1.5f, Constants.Camera.VIEWPORT_HEIGHT / 11f), game.getFont());
 
         Gdx.input.setInputProcessor(this);
     }
@@ -61,8 +53,8 @@ public class ScoreScreen implements Screen, InputProcessor {
         }
 
         if(Constants.Game.DEBUG_MODE) {
-            game.getShapeRenderer().rect(newGameButton.getBounds().x, newGameButton.getBounds().y, newGameButton.getBounds().width, newGameButton.getBounds().height);
-            game.getShapeRenderer().rect(quitButton.getBounds().x, quitButton.getBounds().y, quitButton.getBounds().width, quitButton.getBounds().height);
+            game.getShapeRenderer().rect(viewModel.getNewGameButton().getBounds().x, viewModel.getNewGameButton().getBounds().y, viewModel.getNewGameButton().getBounds().width, viewModel.getNewGameButton().getBounds().height);
+            game.getShapeRenderer().rect(viewModel.getQuitButton().getBounds().x, viewModel.getQuitButton().getBounds().y, viewModel.getQuitButton().getBounds().width, viewModel.getQuitButton().getBounds().height);
         }
         game.getShapeRenderer().end();
 
@@ -73,8 +65,8 @@ public class ScoreScreen implements Screen, InputProcessor {
         textUtils.writeList(makeScoreList());
         game.getSpriteBatch().end();
 
-        newGameButton.draw(game.getSpriteBatch(), game.getShapeRenderer());
-        quitButton.draw(game.getSpriteBatch(), game.getShapeRenderer());
+        viewModel.getNewGameButton().draw(game.getSpriteBatch(), game.getShapeRenderer());
+        viewModel.getQuitButton().draw(game.getSpriteBatch(), game.getShapeRenderer());
 
         viewModel.update();
     }
@@ -130,9 +122,9 @@ public class ScoreScreen implements Screen, InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         camera.unproject(tp.set(screenX, screenY, 0));
-        if(newGameButton.getBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+        if(viewModel.getNewGameButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
             game.navigateTo(ScreenState.GAME);
-        } else if(quitButton.getBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+        } else if(viewModel.getQuitButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
             Gdx.app.exit();
         }
         return true;
@@ -150,7 +142,10 @@ public class ScoreScreen implements Screen, InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        return false;
+        camera.unproject(tp.set(screenX, screenY, 0));
+        viewModel.getNewGameButton().setHover(viewModel.getNewGameButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY));
+        viewModel.getQuitButton().setHover(viewModel.getQuitButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY));
+        return true;
     }
 
     @Override
