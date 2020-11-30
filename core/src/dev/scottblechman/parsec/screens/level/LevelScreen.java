@@ -82,6 +82,7 @@ public class LevelScreen implements Screen, InputProcessor {
 
         // Draw barrier
         if(viewModel.getBarrier() != null) {
+            game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.SATELLITE));
             game.getShapeRenderer().rect(viewModel.getBarrier().getPosition().x - (viewModel.getBarrier().getWidth() / 2),
                     viewModel.getBarrier().getPosition().y - (viewModel.getBarrier().getHeight() / 2),
                     viewModel.getBarrier().getWidth(), viewModel.getBarrier().getHeight());

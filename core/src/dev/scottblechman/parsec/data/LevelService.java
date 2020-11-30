@@ -83,4 +83,8 @@ public class LevelService {
             currentLevel++;
         }
     }
+
+    public boolean lastTutorialLevel() {
+        return currentLevel == numTutorialLevels;
+    }
 }

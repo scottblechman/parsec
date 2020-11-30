@@ -297,6 +297,10 @@ public class LevelViewModel {
             }
             completeMessage.reset();
         }
+        // Hide tutorial if complete
+        if(levelService.lastTutorialLevel()) {
+            prefsService.markTutorialDone();
+        }
     }
 
     /**

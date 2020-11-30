@@ -24,7 +24,7 @@ public class TypewriterText implements IComponent {
 
     @Override
     public void update() {
-        if(writing && elapsedTime <= text.length()) {
+        if(text != null && writing && elapsedTime <= text.length()) {
             elapsedTime += (Gdx.graphics.getDeltaTime() * Constants.Graphics.TYPEWRITER_SPEED);
         }
     }
