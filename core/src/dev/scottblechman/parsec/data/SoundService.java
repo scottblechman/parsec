@@ -11,6 +11,7 @@ public class SoundService {
     private long idExplosion;
     private long idTypewriter;
     private long idButton;
+    private long idDrag;
 
     public void playExplosionSFX() {
         if(sound != null) {
@@ -42,6 +43,24 @@ public class SoundService {
         }
         sound = Gdx.audio.newSound(Gdx.files.internal("audio/button.ogg"));
         idButton = sound.play(1.0f);
+    }
+
+    public void playDragSFX(float pitchShift) {
+        if(sound != null) {
+            sound.stop(idDrag);
+        }
+        sound = Gdx.audio.newSound(Gdx.files.internal("audio/drag.ogg"));
+        idDrag = sound.play(1.0f);
+        sound.setLooping(idDrag, true);
+        sound.setPitch(idDrag, pitchShift);
+    }
+
+    public void stopDragSFX() {
+        if(sound != null) {
+            sound.setLooping(idDrag, false);
+            sound.setPitch(idDrag, 1);
+            sound.stop(idDrag);
+        }
     }
 
     public void dispose() {
