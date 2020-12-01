@@ -5,12 +5,18 @@
     "advanceAlways": true
   },
   {
-    "message": "Gravity changes your satellite's orbit. Shoot for the moon!",
+    "message": "Gravity changes your satellite's orbit. This time, aim for the moon.\n(HINT: Press ESC to re-try a shot.)",
     "targetRadius": 100,
     "barrier": false
   },
   {
-    "message": "Now for something harder. Try to hit the moon while aiming past the barrier.",
+    "message": "Avoid the other moons. Only the gray one counts!",
+    "targetRadius": 100,
+    "barrier": false,
+    "moons": [120]
+  },
+  {
+    "message": "Now for something harder.\nTry to hit the moon while aiming past the barrier.",
     "targetRadius": 100,
     "barrier": true
   }

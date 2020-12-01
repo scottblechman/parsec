@@ -3,14 +3,13 @@ package dev.scottblechman.parsec.screens.menu;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
-import dev.scottblechman.parsec.common.components.Button;
 import dev.scottblechman.parsec.state.enums.ScreenState;
 import dev.scottblechman.parsec.util.TextUtils;
 
@@ -21,17 +20,15 @@ public class MenuScreen implements Screen, InputProcessor {
 
     private TextUtils textUtils;
 
-    private final Button newGameButton;
-    private final Button quitButton;
-
     Vector3 tp = new Vector3();
+
+    private final MenuViewModel viewModel;
 
     public MenuScreen(Parsec game) {
         this.game = game;
+        this.viewModel = new MenuViewModel(game);
         this.camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.Camera.VIEWPORT_WIDTH, Constants.Camera.VIEWPORT_HEIGHT);
-        newGameButton = new Button("NEW GAME", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 2f, Constants.Camera.VIEWPORT_HEIGHT / 2f), game.getFont());
-        quitButton = new Button("QUIT", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 2f, Constants.Camera.VIEWPORT_HEIGHT / 3f), game.getFont());
 
         Gdx.input.setInputProcessor(this);
     }
@@ -43,25 +40,36 @@ public class MenuScreen implements Screen, InputProcessor {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Color color = Color.valueOf(Constants.Colors.BACKGROUND_PRIMARY);
+        Gdx.gl.glClearColor(color.r, color.g, color.b, color.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
 
+        game.getSpriteBatch().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
         game.getSpriteBatch().begin();
         game.getFont().getData().setScale(3f);
         textUtils.writeGrid("(PAR) SEC", 5, 2, 3);
         game.getFont().getData().setScale(1f);
-        newGameButton.draw(game.getSpriteBatch());
-        quitButton.draw(game.getSpriteBatch());
         game.getSpriteBatch().end();
 
-        if(Constants.Game.DEBUG_MODE) {
-            game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
-            game.getShapeRenderer().rect(newGameButton.getBounds().x, newGameButton.getBounds().y, newGameButton.getBounds().width, newGameButton.getBounds().height);
-            game.getShapeRenderer().rect(quitButton.getBounds().x, quitButton.getBounds().y, quitButton.getBounds().width, quitButton.getBounds().height);
-            game.getShapeRenderer().end();
+        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
+        game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
+        // Draw star field
+        for(Vector3 star : viewModel.getStarField()) {
+            game.getShapeRenderer().point(star.x, star.y, 0);
         }
+
+        if(Constants.Game.DEBUG_MODE) {
+            game.getShapeRenderer().rect(viewModel.getNewGameButton().getBounds().x, viewModel.getNewGameButton().getBounds().y, viewModel.getNewGameButton().getBounds().width, viewModel.getNewGameButton().getBounds().height);
+            game.getShapeRenderer().rect(viewModel.getQuitButton().getBounds().x, viewModel.getQuitButton().getBounds().y, viewModel.getQuitButton().getBounds().width, viewModel.getQuitButton().getBounds().height);
+        }
+        game.getShapeRenderer().end();
+
+        viewModel.getNewGameButton().draw(game.getSpriteBatch(), game.getShapeRenderer());
+        viewModel.getQuitButton().draw(game.getSpriteBatch(), game.getShapeRenderer());
+
+        viewModel.update();
     }
 
     @Override
@@ -107,9 +115,9 @@ public class MenuScreen implements Screen, InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         camera.unproject(tp.set(screenX, screenY, 0));
-        if(newGameButton.getBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+        if(viewModel.getNewGameButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
             game.navigateTo(ScreenState.GAME);
-        } else if(quitButton.getBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+        } else if(viewModel.getQuitButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
             Gdx.app.exit();
         }
         return true;
@@ -127,7 +135,10 @@ public class MenuScreen implements Screen, InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        return false;
+        camera.unproject(tp.set(screenX, screenY, 0));
+        viewModel.getNewGameButton().setHover(viewModel.getNewGameButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY));
+        viewModel.getQuitButton().setHover(viewModel.getQuitButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY));
+        return true;
     }
 
     @Override

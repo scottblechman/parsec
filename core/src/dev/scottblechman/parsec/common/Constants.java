@@ -45,7 +45,50 @@ public class Constants {
 
         private Game() { }
 
-        public static final float PROJECTILE_TIMEOUT = 30f;
+        public static final float PROJECTILE_TIMEOUT = 25f;
         public static final boolean DEBUG_MODE = false;
+    }
+
+    public static class Colors {
+
+        private Colors() { }
+
+        public static final String BACKGROUND_PRIMARY = "#16161D";
+        public static final String FOREGROUND_PRIMARY = "#E5EBEA";
+        public static final String SUN = "#FFEDC2";
+        public static final String SATELLITE = "#69747C";
+        public static final String MOON = "#856A5D";
+        public static final String TARGET = "#BDC2C7";
+    }
+
+    public static class Graphics {
+
+        private Graphics() { }
+
+        // The number of stars on screen at a time
+        public static final int STAR_FIELD_SIZE = 100;
+
+        // Minimum pixels a star can travel before disappearing
+        public static final int STAR_BURNOUT_MIN = 100;
+
+        // Maximum pixels a star can travel before disappearing
+        public static final int STAR_BURNOUT_MAX = 200;
+
+        // The chance, from 0% to 100%, of a new star being created when there is a gap
+        public static final int STAR_SPAWN_CHANCE = 50;
+
+        // How fast to write new characters from the tutorial message
+        public static final int TYPEWRITER_SPEED = 12;
+
+        // Ensures reddening of satellite model is visible before timeout elapses
+        public static final int SATELLITE_HUE_SCALAR = (int) (Game.PROJECTILE_TIMEOUT / 3f);
+
+        public static final int BUTTON_PADDING = 4;
+
+        public static final int BUTTON_RADIUS = 3;
+
+        public static final int BUTTON_COOLDOWN_FRAMES = 20;
+
+        public static final int EXPLOSION_RADIUS_SCALAR = 2;
     }
 }

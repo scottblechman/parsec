@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.common.components.Explosion;
 import dev.scottblechman.parsec.models.Moon;
 import dev.scottblechman.parsec.models.enums.EntityType;
 import dev.scottblechman.parsec.util.TextUtils;
@@ -56,40 +57,49 @@ public class LevelScreen implements Screen, InputProcessor {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Color color = Color.valueOf(Constants.Colors.BACKGROUND_PRIMARY);
+        Gdx.gl.glClearColor(color.r, color.g, color.b, color.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
         game.getSpriteBatch().setProjectionMatrix(camera.combined);
         game.getShapeRenderer().setProjectionMatrix(camera.combined);
 
+        game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Line);
+        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
+        // Draw star field
+        for(Vector3 star : viewModel.getStarField()) {
+            game.getShapeRenderer().point(star.x, star.y, 0);
+        }
+        game.getShapeRenderer().end();
+
         game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
+        game.getShapeRenderer().setColor(getSatColor());
+
         // Draw projectile
-        game.getShapeRenderer().circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
-                Constants.Entities.PROJECTILE_RADIUS);
-        // Draw drag (if occurring)
-        if(dragging) {
-            game.getShapeRenderer().line(dragStart, dragEnd);
+        if(!viewModel.isLevelFinished()) {
+            drawSatellite();
         }
-        for(Moon moon : viewModel.getMoons()) {
-            if(moon.getType() == EntityType.TARGET_MOON) {
-                game.getShapeRenderer().setColor(Color.GOLDENROD);
-            }
-            game.getShapeRenderer().circle(moon.getPosition().x, moon.getPosition().y, Constants.Entities.MOON_RADIUS);
-            if(moon.getType() == EntityType.TARGET_MOON) {
-                game.getShapeRenderer().setColor(Color.WHITE);
-            }
-        }
+
         // Draw barrier
         if(viewModel.getBarrier() != null) {
+            game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.SATELLITE));
             game.getShapeRenderer().rect(viewModel.getBarrier().getPosition().x - (viewModel.getBarrier().getWidth() / 2),
                     viewModel.getBarrier().getPosition().y - (viewModel.getBarrier().getHeight() / 2),
                     viewModel.getBarrier().getWidth(), viewModel.getBarrier().getHeight());
         }
 
+        // Draw drag (if occurring)
+        if(dragging) {
+            game.getShapeRenderer().line(dragStart, dragEnd);
+        }
+        drawMoons();
+
         // Draw sun
+        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.SUN));
         game.getShapeRenderer().circle(viewModel.getSunPosition().x, viewModel.getSunPosition().y,
                 Constants.Entities.SUN_RADIUS);
+        game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
 
         game.getShapeRenderer().end();
 
@@ -107,13 +117,25 @@ public class LevelScreen implements Screen, InputProcessor {
         game.getShapeRenderer().end();
 
         game.getSpriteBatch().begin();
-        if(viewModel.tutorialMode() && !viewModel.onTutorialLevel()) {
+        if(viewModel.tutorialMode() && viewModel.onTutorialLevel()) {
             textUtils.writeGrid(viewModel.getLevelMessage(), 3, 1, 2);
         } else {
             textUtils.writeGrid("SHOTS:  " + viewModel.getShots(), 4, 1, 3);
             textUtils.writeGrid("SYSTEM  " + viewModel.getLevelNumber(), 4, 2, 3);
         }
+        if(viewModel.isLevelFinished()) {
+            textUtils.writeGrid(viewModel.getCompleteMessage(), 5, 2, 3);
+        }
         game.getSpriteBatch().end();
+
+        if(viewModel.isLevelFinished()) {
+            viewModel.getNextLevelButton().draw(game.getSpriteBatch(), game.getShapeRenderer());
+        }
+
+        // Draw particle effects
+        for(Explosion e : viewModel.getExplosions()) {
+            e.draw(game.getSpriteBatch(), game.getShapeRenderer());
+        }
 
         viewModel.stepWorld();
     }
@@ -173,6 +195,9 @@ public class LevelScreen implements Screen, InputProcessor {
             dragStart.y = camera.viewportHeight - screenY;
             dragEnd.y = camera.viewportHeight - screenY;
         }
+        if(viewModel.getNextLevelButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+            viewModel.nextLevel();
+        }
         return true;
     }
 
@@ -202,7 +227,9 @@ public class LevelScreen implements Screen, InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        return false;
+        camera.unproject(tp.set(screenX, screenY, 0));
+        viewModel.getNextLevelButton().setHover(viewModel.getNextLevelButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY));
+        return true;
     }
 
     @Override
@@ -220,5 +247,46 @@ public class LevelScreen implements Screen, InputProcessor {
                 game.getShapeRenderer().rect(start.x, start.y, end.x,  end.y);
             }
         }
+    }
+
+    /**
+     * Uses the timeout to add a hue and lightness adjustment to the satellite, mimicking heating.
+     * @return color with hue and lightness adjusted for timeout state
+     */
+    private Color getSatColor() {
+        // Mod satellite lightness based on timer
+        Color satelliteColor = Color.valueOf(Constants.Colors.SATELLITE);
+        float[] hsv = new float[3];
+        satelliteColor.toHsv(hsv);
+        if(hsv[0] > 0) {
+            hsv[0] -= viewModel.getTimeout() * Constants.Graphics.SATELLITE_HUE_SCALAR;
+        } else {
+            hsv[0] = 0;
+        }
+        hsv[2] += (viewModel.getTimeout()) / 100;
+
+        return satelliteColor.fromHsv(hsv);
+    }
+
+    private void drawMoons() {
+        for(Moon moon : viewModel.getMoons()) {
+            if(moon.getType() == EntityType.TARGET_MOON) {
+                game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.TARGET));
+            } else {
+                game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.MOON));
+            }
+            game.getShapeRenderer().circle(moon.getPosition().x, moon.getPosition().y, Constants.Entities.MOON_RADIUS);
+            if(moon.getType() == EntityType.TARGET_MOON) {
+                game.getShapeRenderer().setColor(Color.valueOf(Constants.Colors.FOREGROUND_PRIMARY));
+            }
+        }
+    }
+
+    private void drawSatellite() {
+        game.getShapeRenderer().circle(viewModel.getProjectilePosition().x, viewModel.getProjectilePosition().y,
+                Constants.Entities.PROJECTILE_RADIUS / 1.5f);
+        game.getShapeRenderer().rect(viewModel.getProjectilePosition().x - Constants.Entities.PROJECTILE_RADIUS * 1.5f,
+                viewModel.getProjectilePosition().y - Constants.Entities.PROJECTILE_RADIUS / 3f,
+                Constants.Entities.PROJECTILE_RADIUS * 3f, Constants.Entities.PROJECTILE_RADIUS / 1.5f);
     }
 }

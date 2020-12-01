@@ -2,10 +2,15 @@ package dev.scottblechman.parsec.screens.level;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.common.components.Button;
+import dev.scottblechman.parsec.common.components.Explosion;
+import dev.scottblechman.parsec.common.components.StarField;
+import dev.scottblechman.parsec.common.components.TypewriterText;
 import dev.scottblechman.parsec.data.LevelService;
 import dev.scottblechman.parsec.data.PrefsService;
 import dev.scottblechman.parsec.listeners.ProjectileListener;
@@ -30,6 +35,11 @@ public class LevelViewModel {
     PrefsService prefsService;
     LevelService levelService;
     Parsec game;
+    StarField starField;
+    Button nextLevelButton;
+    TypewriterText levelMessage;
+    TypewriterText completeMessage;
+    ArrayList<Explosion> explosions;
 
     static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
@@ -46,6 +56,9 @@ public class LevelViewModel {
     private boolean resetProjectile = false;
     private boolean resetMoons = false;
     private boolean resetBarrier = false;
+
+    // Indicates whether to show an option to advance to the next level
+    private boolean levelFinished = false;
 
     public LevelViewModel(Parsec game) {
         prefsService = new PrefsService();
@@ -71,6 +84,11 @@ public class LevelViewModel {
         contactListener = new ProjectileListener(this);
         world.setContactListener(contactListener);
         this.game = game;
+        starField = new StarField();
+        nextLevelButton = new Button("NEXT LEVEL", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 2f, Constants.Camera.VIEWPORT_HEIGHT / 3f), game.getFont());
+        levelMessage = new TypewriterText(levelService.getMessage(), true);
+        completeMessage = new TypewriterText("LEVEL COMPLETE!", false);
+        explosions = new ArrayList<>();
     }
 
     public Vector2 getProjectilePosition() {
@@ -106,7 +124,11 @@ public class LevelViewModel {
     }
 
     public String getLevelMessage() {
-        return levelService.getMessage();
+        return levelMessage.getText().toUpperCase();
+    }
+
+    public String getCompleteMessage() {
+        return completeMessage.getText();
     }
 
     public boolean shouldAlwaysAdvance() {
@@ -117,6 +139,26 @@ public class LevelViewModel {
         return levelService.onTutorialLevel();
     }
 
+    public List<Vector3> getStarField() {
+        return starField.getPool();
+    }
+
+    public boolean isLevelFinished() {
+        return levelFinished;
+    }
+
+    public float getTimeout() {
+        return (float) Math.ceil(timeout);
+    }
+
+    public List<Explosion> getExplosions() {
+        return explosions;
+    }
+
+    public Button getNextLevelButton() {
+        return nextLevelButton;
+    }
+
     public void dispose() {
         world.dispose();
     }
@@ -125,6 +167,19 @@ public class LevelViewModel {
         float delta = Gdx.graphics.getDeltaTime();
 
         accumulator += Math.min(delta, 0.25f);
+
+        // Update non-physics graphics
+        starField.update();
+        levelMessage.update();
+        completeMessage.update();
+        ArrayList<Explosion> remainingExplosions = new ArrayList<>();
+        for(Explosion e : explosions) {
+            if(!e.isComplete()) {
+                e.update();
+                remainingExplosions.add(e);
+            }
+        }
+        explosions = remainingExplosions;
 
         while (accumulator >= STEP_TIME) {
             // Apply forces before stepping world
@@ -218,6 +273,7 @@ public class LevelViewModel {
      */
     public void reset(boolean increment) {
         if(increment) {
+            createSatelliteParticles();
             shotsAttempted++;
         } else {
             shotsAttempted = 0;
@@ -241,6 +297,7 @@ public class LevelViewModel {
      * Advances the level after the target moon has been hit.
      */
     public void nextLevel() {
+        levelFinished = false;
         if(!levelService.onTutorialLevel()) {
             game.getScoreService().writeScore(levelService.getLevelNumber(), shotsAttempted + 1);
         }
@@ -251,6 +308,27 @@ public class LevelViewModel {
             resetBarrier = true;
             reset(false);
             levelService.nextLevel();
+            if(levelService.onTutorialLevel()) {
+                levelMessage = new TypewriterText(levelService.getMessage(), true);
+            }
+            completeMessage.reset();
         }
+        // Hide tutorial if complete
+        if(levelService.lastTutorialLevel()) {
+            prefsService.markTutorialDone();
+        }
+    }
+
+    /**
+     * Creates a break between level completion and next level start by showing a button to advance.
+     */
+    public void finishLevel() {
+        levelFinished = true;
+        createSatelliteParticles();
+        completeMessage.start();
+    }
+
+    public void createSatelliteParticles() {
+        explosions.add(new Explosion(projectile.getBody().getPosition().cpy(), Constants.Entities.PROJECTILE_RADIUS));
     }
 }
