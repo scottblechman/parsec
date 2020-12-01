@@ -1,17 +1,25 @@
 package dev.scottblechman.parsec.data;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 
 public class SoundService {
 
     private Sound sound;
+    private Music music;
 
     // SFX ids for recall
     private long idExplosion;
     private long idTypewriter;
     private long idButton;
     private long idDrag;
+
+    public void playMusic() {
+        music = Gdx.audio.newMusic(Gdx.files.internal("audio/music.ogg"));
+        music.setLooping(true);
+        music.play();
+    }
 
     public void playExplosionSFX() {
         if(sound != null) {
@@ -66,6 +74,10 @@ public class SoundService {
     public void dispose() {
         if(sound != null) {
             sound.dispose();
+        }
+        if(music != null) {
+            music.stop();
+            music.dispose();
         }
     }
 }

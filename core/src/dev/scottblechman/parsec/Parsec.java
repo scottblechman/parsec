@@ -28,6 +28,7 @@ public class Parsec extends Game {
 		scoreService = new ScoreService();
 		soundService = new SoundService();
 		navigator = new ScreenNavigation(this);
+		soundService.playMusic();
 	}
 
 	@Override
