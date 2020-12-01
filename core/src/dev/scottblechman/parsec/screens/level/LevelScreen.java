@@ -200,6 +200,7 @@ public class LevelScreen implements Screen, InputProcessor {
             dragEnd.y = camera.viewportHeight - screenY;
         }
         if(viewModel.isLevelFinished() && viewModel.getNextLevelButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+            game.getSoundService().playButtonSFX();
             viewModel.nextLevel();
         }
         return true;
@@ -212,6 +213,7 @@ public class LevelScreen implements Screen, InputProcessor {
         if(!viewModel.isInMotion()) {
             dragging = false;
             viewModel.shootProjectile(dragStart, dragEnd);
+            game.getSoundService().stopDragSFX();
         }
         return true;
     }
@@ -225,6 +227,7 @@ public class LevelScreen implements Screen, InputProcessor {
             // Ensure end point is never higher than start point (pellet never shot negative)
             if (camera.viewportHeight - screenY < dragStart.y)
                 dragEnd.y = camera.viewportHeight - screenY;
+            game.getSoundService().playDragSFX(dragStart.dst(dragEnd) / 50);
         }
         return true;
     }
