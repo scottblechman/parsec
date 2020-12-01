@@ -60,6 +60,9 @@ public class LevelViewModel {
     // Indicates whether to show an option to advance to the next level
     private boolean levelFinished = false;
 
+    // Prevents planets on projectile starting orbit from increasing shot count
+    private float invulnerability = 0f;
+
     public LevelViewModel(Parsec game) {
         prefsService = new PrefsService();
         boolean tutorial = prefsService.showTutorial();
@@ -159,6 +162,14 @@ public class LevelViewModel {
         return nextLevelButton;
     }
 
+    public boolean isProjectileInvulnerable() {
+        return invulnerability > 0f;
+    }
+
+    public float getRemainingProjectileInvulnerability() {
+        return invulnerability;
+    }
+
     public void dispose() {
         world.dispose();
     }
@@ -197,6 +208,11 @@ public class LevelViewModel {
             resetBodies();
             for(Moon moon : moons) {
                 moon.update();
+            }
+            if(invulnerability > 0f) {
+                invulnerability -= accumulator;
+            } else {
+                invulnerability = 0f;
             }
             world.step(STEP_TIME, 6, 2);
 
@@ -245,6 +261,7 @@ public class LevelViewModel {
      * Uses the existing mouse drag information to apply an impulse to the projectile body.
      */
     protected void shootProjectile(Vector2 start, Vector2 end) {
+        shotsAttempted++;
         projectileInMotion = true;
         float impulseX = start.x - end.x;
         // Assume that start pos y is always >= end pos y
@@ -274,7 +291,7 @@ public class LevelViewModel {
     public void reset(boolean increment) {
         if(increment) {
             createSatelliteParticles();
-            shotsAttempted++;
+            invulnerability = Constants.Entities.PROJECTILE_MAX_INVUL;
         } else {
             shotsAttempted = 0;
         }
@@ -299,7 +316,7 @@ public class LevelViewModel {
     public void nextLevel() {
         levelFinished = false;
         if(!levelService.onTutorialLevel()) {
-            game.getScoreService().writeScore(levelService.getLevelNumber(), shotsAttempted + 1);
+            game.getScoreService().writeScore(levelService.getLevelNumber(), shotsAttempted);
         }
         if(levelService.lastLevel()) {
             game.navigateTo(ScreenState.SCORE);

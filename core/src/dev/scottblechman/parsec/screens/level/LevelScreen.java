@@ -75,11 +75,15 @@ public class LevelScreen implements Screen, InputProcessor {
 
         game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
         game.getShapeRenderer().setColor(getSatColor());
-
+        Gdx.gl.glEnable(GL20.GL_BLEND);
         // Draw projectile
         if(!viewModel.isLevelFinished()) {
             drawSatellite();
         }
+        game.getShapeRenderer().end();
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+        game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
 
         // Draw barrier
         if(viewModel.getBarrier() != null) {
@@ -195,7 +199,7 @@ public class LevelScreen implements Screen, InputProcessor {
             dragStart.y = camera.viewportHeight - screenY;
             dragEnd.y = camera.viewportHeight - screenY;
         }
-        if(viewModel.getNextLevelButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+        if(viewModel.isLevelFinished() && viewModel.getNextLevelButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
             viewModel.nextLevel();
         }
         return true;
@@ -265,7 +269,11 @@ public class LevelScreen implements Screen, InputProcessor {
         }
         hsv[2] += (viewModel.getTimeout()) / 100;
 
-        return satelliteColor.fromHsv(hsv);
+        satelliteColor = satelliteColor.fromHsv(hsv);
+        if(viewModel.isProjectileInvulnerable()) {
+            satelliteColor.a = (float) (1 - Math.exp(viewModel.getRemainingProjectileInvulnerability()));
+        }
+        return satelliteColor;
     }
 
     private void drawMoons() {
