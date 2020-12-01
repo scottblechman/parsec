@@ -116,8 +116,10 @@ public class MenuScreen implements Screen, InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         camera.unproject(tp.set(screenX, screenY, 0));
         if(viewModel.getNewGameButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+            game.getSoundService().playButtonSFX();
             game.navigateTo(ScreenState.GAME);
         } else if(viewModel.getQuitButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+            game.getSoundService().playButtonSFX();
             Gdx.app.exit();
         }
         return true;

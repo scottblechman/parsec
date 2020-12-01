@@ -7,9 +7,10 @@ public class SoundService {
 
     private Sound sound;
 
-    // SFX id for recall
+    // SFX ids for recall
     private long idExplosion;
     private long idTypewriter;
+    private long idButton;
 
     public void playExplosionSFX() {
         if(sound != null) {
@@ -33,6 +34,14 @@ public class SoundService {
             sound.setLooping(idTypewriter, false);
             sound.stop(idTypewriter);
         }
+    }
+
+    public void playButtonSFX() {
+        if(sound != null) {
+            sound.stop(idButton);
+        }
+        sound = Gdx.audio.newSound(Gdx.files.internal("audio/button.ogg"));
+        idButton = sound.play(1.0f);
     }
 
     public void dispose() {

@@ -200,6 +200,7 @@ public class LevelScreen implements Screen, InputProcessor {
             dragEnd.y = camera.viewportHeight - screenY;
         }
         if(viewModel.isLevelFinished() && viewModel.getNextLevelButton().getHoverBounds().contains(screenX, Constants.Camera.VIEWPORT_HEIGHT - (float) screenY)) {
+            game.getSoundService().playButtonSFX();
             viewModel.nextLevel();
         }
         return true;
