@@ -13,11 +13,8 @@ public class TypewriterText implements IComponent {
     private final String text;
     private boolean writing;
 
-    // Tracks when to play a typing SFX
-    private int textLength;
-
     // For accessing SFX service
-    private Parsec game;
+    private final Parsec game;
 
     public TypewriterText(String text, boolean startImmediately, Parsec game) {
         this.text = text;
@@ -34,10 +31,10 @@ public class TypewriterText implements IComponent {
     public void update() {
         if(text != null && writing && elapsedTime <= text.length()) {
             elapsedTime += (Gdx.graphics.getDeltaTime() * Constants.Graphics.TYPEWRITER_SPEED);
-        }
-        if(text != null && text.substring(0, Math.round(elapsedTime)).length() > textLength) {
-            textLength = text.substring(0, Math.round(elapsedTime)).length();
-            game.getSoundService().playTypewriterSFX();
+            if(elapsedTime > text.length()) {
+                writing = false;
+                game.getSoundService().stopTypewriterSFX();
+            }
         }
     }
 
@@ -51,6 +48,7 @@ public class TypewriterText implements IComponent {
 
     public void start() {
         writing = true;
+        game.getSoundService().playTypewriterSFX();
     }
 
     public void reset() {

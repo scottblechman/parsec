@@ -346,7 +346,9 @@ public class LevelViewModel {
     }
 
     public void createSatelliteParticles() {
-        explosions.add(new Explosion(projectile.getBody().getPosition().cpy(), Constants.Entities.PROJECTILE_RADIUS));
-        game.getSoundService().playExplosionSFX();
+        if(!levelFinished) {
+            explosions.add(new Explosion(projectile.getBody().getPosition().cpy(), Constants.Entities.PROJECTILE_RADIUS));
+            game.getSoundService().playExplosionSFX();
+        }
     }
 }

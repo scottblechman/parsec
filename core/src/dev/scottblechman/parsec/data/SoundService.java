@@ -8,22 +8,31 @@ public class SoundService {
     private Sound sound;
 
     // SFX id for recall
-    private long id;
+    private long idExplosion;
+    private long idTypewriter;
 
     public void playExplosionSFX() {
         if(sound != null) {
-            sound.stop(id);
+            sound.stop(idExplosion);
         }
         sound = Gdx.audio.newSound(Gdx.files.internal("audio/explosion.ogg"));
-        id = sound.play(1.0f);
+        idExplosion = sound.play(1.0f);
     }
 
     public void playTypewriterSFX() {
         if(sound != null) {
-            sound.stop(id);
+            sound.stop(idTypewriter);
         }
         sound = Gdx.audio.newSound(Gdx.files.internal("audio/type.ogg"));
-        id = sound.play(1.0f);
+        idTypewriter = sound.play(1.0f);
+        sound.setLooping(idTypewriter, true);
+    }
+
+    public void stopTypewriterSFX() {
+        if(sound != null) {
+            sound.setLooping(idTypewriter, false);
+            sound.stop(idTypewriter);
+        }
     }
 
     public void dispose() {
