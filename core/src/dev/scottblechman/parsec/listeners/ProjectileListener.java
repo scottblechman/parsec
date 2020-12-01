@@ -36,6 +36,10 @@ public class ProjectileListener implements ContactListener {
         switch((EntityType) target.getUserData()) {
             case SUN:
             case MOON:
+                if(!viewModel.isLevelFinished() && !viewModel.isProjectileInvulnerable()) {
+                    viewModel.reset(true);
+                }
+                break;
             case BARRIER:
                 if(!viewModel.isLevelFinished()) {
                     viewModel.reset(true);

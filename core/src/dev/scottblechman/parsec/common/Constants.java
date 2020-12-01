@@ -39,6 +39,8 @@ public class Constants {
                 (float) Camera.VIEWPORT_HEIGHT / 4f);
         public static final int BARRIER_WIDTH = 40;
         public static final int BARRIER_HEIGHT = BARRIER_WIDTH / 4;
+        // Invulnerability time, in seconds
+        public static final float PROJECTILE_MAX_INVUL = 2f;
     }
 
     public static class Game {

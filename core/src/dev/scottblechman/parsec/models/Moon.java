@@ -24,6 +24,9 @@ public class Moon implements IEntity {
     // Preserves orbital motion
     DistanceJoint joint;
 
+    // Controls direction; moves CCW by default
+    int moveCW;
+
     public Moon(World world, int radius, boolean target) {
         this.radius = radius;
         this.direction = new Vector2();
@@ -59,6 +62,9 @@ public class Moon implements IEntity {
         jointDef.collideConnected = true;
 
         joint = (DistanceJoint) world.createJoint(jointDef);
+
+        // 50% chance of CW or CCW movement
+        moveCW = (Math.random() < 0.5) ? 0 : 1;
     }
 
     @Override
@@ -76,7 +82,7 @@ public class Moon implements IEntity {
     }
 
     public void update() {
-        direction = entity.getBody().getPosition().sub(pivotPoint).rotate(90).nor();
+        direction = entity.getBody().getPosition().sub(pivotPoint).rotate(90).rotate(180 * (float) moveCW).nor();
         float scalar = radius;
         scalar *= Constants.Game.DEBUG_MODE ? 1 : Constants.Physics.MOON_FORCE_SCALAR;
         entity.getBody().applyForceToCenter(direction.cpy().scl(scalar), true);
