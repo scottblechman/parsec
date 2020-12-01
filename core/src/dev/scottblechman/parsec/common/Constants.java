@@ -88,5 +88,7 @@ public class Constants {
         public static final int BUTTON_RADIUS = 3;
 
         public static final int BUTTON_COOLDOWN_FRAMES = 20;
+
+        public static final int EXPLOSION_RADIUS_SCALAR = 2;
     }
 }

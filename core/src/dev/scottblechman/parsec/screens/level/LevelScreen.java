@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
+import dev.scottblechman.parsec.common.components.Explosion;
 import dev.scottblechman.parsec.models.Moon;
 import dev.scottblechman.parsec.models.enums.EntityType;
 import dev.scottblechman.parsec.util.TextUtils;
@@ -129,6 +130,11 @@ public class LevelScreen implements Screen, InputProcessor {
 
         if(viewModel.isLevelFinished()) {
             viewModel.getNextLevelButton().draw(game.getSpriteBatch(), game.getShapeRenderer());
+        }
+
+        // Draw particle effects
+        for(Explosion e : viewModel.getExplosions()) {
+            e.draw(game.getSpriteBatch(), game.getShapeRenderer());
         }
 
         viewModel.stepWorld();

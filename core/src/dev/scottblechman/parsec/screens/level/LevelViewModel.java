@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import dev.scottblechman.parsec.Parsec;
 import dev.scottblechman.parsec.common.Constants;
 import dev.scottblechman.parsec.common.components.Button;
+import dev.scottblechman.parsec.common.components.Explosion;
 import dev.scottblechman.parsec.common.components.StarField;
 import dev.scottblechman.parsec.common.components.TypewriterText;
 import dev.scottblechman.parsec.data.LevelService;
@@ -38,6 +39,7 @@ public class LevelViewModel {
     Button nextLevelButton;
     TypewriterText levelMessage;
     TypewriterText completeMessage;
+    ArrayList<Explosion> explosions;
 
     static final float STEP_TIME = 1f/60f;
     float accumulator = 0;
@@ -86,6 +88,7 @@ public class LevelViewModel {
         nextLevelButton = new Button("NEXT LEVEL", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 2f, Constants.Camera.VIEWPORT_HEIGHT / 3f), game.getFont());
         levelMessage = new TypewriterText(levelService.getMessage(), true);
         completeMessage = new TypewriterText("LEVEL COMPLETE!", false);
+        explosions = new ArrayList<>();
     }
 
     public Vector2 getProjectilePosition() {
@@ -148,6 +151,10 @@ public class LevelViewModel {
         return (float) Math.ceil(timeout);
     }
 
+    public List<Explosion> getExplosions() {
+        return explosions;
+    }
+
     public Button getNextLevelButton() {
         return nextLevelButton;
     }
@@ -165,6 +172,14 @@ public class LevelViewModel {
         starField.update();
         levelMessage.update();
         completeMessage.update();
+        ArrayList<Explosion> remainingExplosions = new ArrayList<>();
+        for(Explosion e : explosions) {
+            if(!e.isComplete()) {
+                e.update();
+                remainingExplosions.add(e);
+            }
+        }
+        explosions = remainingExplosions;
 
         while (accumulator >= STEP_TIME) {
             // Apply forces before stepping world
@@ -309,5 +324,9 @@ public class LevelViewModel {
     public void finishLevel() {
         levelFinished = true;
         completeMessage.start();
+    }
+
+    public void createSatelliteParticles() {
+        explosions.add(new Explosion(projectile.getBody().getPosition().cpy(), Constants.Entities.PROJECTILE_RADIUS));
     }
 }
