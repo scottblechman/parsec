@@ -273,6 +273,7 @@ public class LevelViewModel {
      */
     public void reset(boolean increment) {
         if(increment) {
+            createSatelliteParticles();
             shotsAttempted++;
         } else {
             shotsAttempted = 0;
@@ -323,6 +324,7 @@ public class LevelViewModel {
      */
     public void finishLevel() {
         levelFinished = true;
+        createSatelliteParticles();
         completeMessage.start();
     }
 

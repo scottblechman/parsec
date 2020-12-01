@@ -38,7 +38,6 @@ public class ProjectileListener implements ContactListener {
             case MOON:
             case BARRIER:
                 if(!viewModel.isLevelFinished()) {
-                    viewModel.createSatelliteParticles();
                     viewModel.reset(true);
                 }
                 break;
