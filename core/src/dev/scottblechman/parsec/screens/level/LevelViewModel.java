@@ -89,8 +89,8 @@ public class LevelViewModel {
         this.game = game;
         starField = new StarField();
         nextLevelButton = new Button("NEXT LEVEL", new Vector2(Constants.Camera.VIEWPORT_WIDTH / 2f, Constants.Camera.VIEWPORT_HEIGHT / 3f), game.getFont());
-        levelMessage = new TypewriterText(levelService.getMessage(), true);
-        completeMessage = new TypewriterText("LEVEL COMPLETE!", false);
+        levelMessage = new TypewriterText(levelService.getMessage(), true, game);
+        completeMessage = new TypewriterText("LEVEL COMPLETE!", false, game);
         explosions = new ArrayList<>();
     }
 
@@ -326,7 +326,7 @@ public class LevelViewModel {
             reset(false);
             levelService.nextLevel();
             if(levelService.onTutorialLevel()) {
-                levelMessage = new TypewriterText(levelService.getMessage(), true);
+                levelMessage = new TypewriterText(levelService.getMessage(), true, game);
             }
             completeMessage.reset();
         }
@@ -347,5 +347,6 @@ public class LevelViewModel {
 
     public void createSatelliteParticles() {
         explosions.add(new Explosion(projectile.getBody().getPosition().cpy(), Constants.Entities.PROJECTILE_RADIUS));
+        game.getSoundService().playExplosionSFX();
     }
 }

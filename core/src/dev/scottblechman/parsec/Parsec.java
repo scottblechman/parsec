@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import dev.scottblechman.parsec.data.SoundService;
 import dev.scottblechman.parsec.state.ScoreService;
 import dev.scottblechman.parsec.state.ScreenNavigation;
 import dev.scottblechman.parsec.state.enums.ScreenState;
@@ -16,6 +17,7 @@ public class Parsec extends Game {
 
 	private ScreenNavigation navigator;
 	private ScoreService scoreService;
+	private SoundService soundService;
 
 	@Override
 	public void create () {
@@ -24,6 +26,7 @@ public class Parsec extends Game {
 		shapeRenderer = new ShapeRenderer();
 
 		scoreService = new ScoreService();
+		soundService = new SoundService();
 		navigator = new ScreenNavigation(this);
 	}
 
@@ -33,6 +36,7 @@ public class Parsec extends Game {
 		font.dispose();
 		shapeRenderer.dispose();
 		this.screen.dispose();
+		soundService.dispose();
 	}
 
 	public SpriteBatch getSpriteBatch() {
@@ -49,6 +53,10 @@ public class Parsec extends Game {
 
 	public ScoreService getScoreService() {
 		return scoreService;
+	}
+
+	public SoundService getSoundService() {
+		return soundService;
 	}
 
 	public void navigateTo(ScreenState nextScreen) {
